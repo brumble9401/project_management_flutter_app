@@ -1,0 +1,83 @@
+import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pma_dclv/data/repositories/task_repository.dart';
+import 'package:pma_dclv/utils/log_util.dart';
+
+import '../../data/models/task/task_model.dart';
+
+part 'task_state.dart';
+
+class TaskCubit extends Cubit<TaskState> {
+  TaskCubit() : super(TaskState.initial());
+  final _taskRepository = TaskRepository.instance();
+
+  Stream<List<TaskModel>> getTaskFromFirestore(
+      String userId, String projectId) async* {
+    try {
+      emit(state.copyWith(taskStatus: TaskStatus.loading));
+      yield* _taskRepository.getTaskFromFirestore(userId, projectId);
+      emit(state.copyWith(taskStatus: TaskStatus.success));
+      LogUtil.info("Fetch tasks success");
+    } catch (e) {
+      LogUtil.error("Fetch tasks error: ", error: e);
+    }
+  }
+
+  Stream<List<TaskModel>> getTaskFromProjectUid(String projectId) async* {
+    try {
+      emit(state.copyWith(taskStatus: TaskStatus.loading));
+      yield* _taskRepository.getTaskFromProjectUid(projectId);
+      emit(state.copyWith(taskStatus: TaskStatus.success));
+      LogUtil.info("Fetch tasks success");
+    } catch (e) {
+      LogUtil.error("Fetch tasks error: ", error: e);
+    }
+  }
+
+  Stream<TaskModel> getTaskFromUid(String taskUid) async* {
+    try {
+      emit(state.copyWith(taskStatus: TaskStatus.loading));
+      yield* _taskRepository.getTaskFromUid(taskUid);
+      emit(state.copyWith(taskStatus: TaskStatus.success));
+      LogUtil.info("Fetch tasks success");
+    } catch (e) {
+      LogUtil.error("Fetch tasks error: ", error: e);
+    }
+  }
+
+  Future<String> createTask(Map<String, dynamic> task) async {
+    try {
+      emit(state.copyWith(taskStatus: TaskStatus.loading));
+      String uid = await _taskRepository.createTask(task);
+      emit(state.copyWith(taskStatus: TaskStatus.success));
+      LogUtil.info("Create task successfully");
+      return uid;
+    } catch (e) {
+      LogUtil.error("Create task failed", error: e);
+      return "";
+    }
+  }
+
+  Stream<List<TaskModel>> getAllTaskFromFirestore(String userId) async* {
+    try {
+      emit(state.copyWith(taskStatus: TaskStatus.loading));
+      yield* _taskRepository.getAllTaskFromFirestore(userId);
+      emit(state.copyWith(taskStatus: TaskStatus.success));
+      LogUtil.info("Fetch tasks success");
+    } catch (e) {
+      LogUtil.error("Fetch tasks error: ", error: e);
+    }
+  }
+
+  Stream<List<TaskModel>> getAllTaskFromWorkspace(
+      String userUId, String workspaceUid) async* {
+    try {
+      emit(state.copyWith(taskStatus: TaskStatus.loading));
+      yield* _taskRepository.getAllTaskFromWorkspace(userUId, workspaceUid);
+      emit(state.copyWith(taskStatus: TaskStatus.success));
+      LogUtil.info("Fetch tasks success");
+    } catch (e) {
+      LogUtil.error("Fetch tasks error: ", error: e);
+    }
+  }
+}
