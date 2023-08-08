@@ -41,4 +41,10 @@ class _MyAllProjectsState extends State<MyAllProjects> {
       },
     );
   }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 }

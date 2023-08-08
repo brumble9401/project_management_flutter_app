@@ -97,8 +97,7 @@ class _MyTaskViewState extends State<MyTaskView> {
                                     tasks: tasks,
                                   );
                           } else {
-                            return const Center(
-                                child: CircularProgressIndicator());
+                            return Container();
                           }
                         } else if (snapshot.hasError) {
                           return Text('Error: ${snapshot.error}');

@@ -836,4 +836,10 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
       ],
     );
   }
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
 }

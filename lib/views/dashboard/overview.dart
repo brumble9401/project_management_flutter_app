@@ -61,7 +61,7 @@ class _MyOverViewState extends State<MyOverView> {
                 if (projectList.isNotEmpty) {
                   return MyProjectCard(project: projectList[0]);
                 } else {
-                  return NoProjectCard();
+                  return const NoProjectCard();
                 }
               } else if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
@@ -129,7 +129,7 @@ class _MyOverViewState extends State<MyOverView> {
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else {
-                  return CircularProgressIndicator();
+                  return const CircularProgressIndicator();
                 }
               },
             ),
