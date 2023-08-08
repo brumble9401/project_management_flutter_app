@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:pma_dclv/data/models/task/task_model.dart';
 
-import '../../../theme/theme.dart';
+import '../../../../theme/theme.dart';
 
 class MyTaskCard extends StatefulWidget {
   const MyTaskCard({super.key, this.onPressed, this.task});

@@ -83,29 +83,34 @@ class _MyDashBoardState extends State<MyDashBoard> {
                 ),
               ),
             ),
-            body: SingleChildScrollView(
-              child: Container(
-                width: double.infinity,
-                padding: EdgeInsets.only(top: 20.h),
-                decoration: const BoxDecoration(
-                  color: white,
-                ),
-                child: Column(
-                  children: [
-                    _buildDropdown(),
-                    MyDashboardTab(
-                      page: _page,
-                      onChangePage: onChangePage,
-                    ),
-                    SizedBox(
-                      height: 10.w,
-                    ),
-                    _page == 0
-                        ? MyOverView(
-                            workspaceUid: workspaceUid,
-                          )
-                        : const MyAnalytics(),
-                  ],
+            body: Container(
+              decoration: const BoxDecoration(
+                color: white,
+              ),
+              child: SingleChildScrollView(
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.only(top: 20.h),
+                  decoration: const BoxDecoration(
+                    color: white,
+                  ),
+                  child: Column(
+                    children: [
+                      _buildDropdown(),
+                      MyDashboardTab(
+                        page: _page,
+                        onChangePage: onChangePage,
+                      ),
+                      SizedBox(
+                        height: 10.w,
+                      ),
+                      _page == 0
+                          ? MyOverView(
+                              workspaceUid: workspaceUid,
+                            )
+                          : const MyAnalytics(),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -131,13 +136,16 @@ class _MyDashBoardState extends State<MyDashBoard> {
               .toList();
           DropListModel workspaces = DropListModel(options);
           OptionItem optionItemSelected = OptionItem(title: "Select workspace");
-          // if (options.isNotEmpty) {
-          //   optionItemSelected = workspaceUid != ""
-          //       ? options.firstWhere((item) => item.id == workspaceUid)
-          //       : OptionItem(title: "Select workspace");
-          // } else {
-          //   optionItemSelected = OptionItem(title: "Select workspace");
-          // }
+          if (options.isNotEmpty) {
+            if (workspaceUid != "") {
+              optionItemSelected =
+                  options.firstWhere((item) => item.id == workspaceUid);
+            } else {
+              optionItemSelected = OptionItem(title: "Select workspace");
+            }
+          } else {
+            optionItemSelected = OptionItem(title: "Select workspace");
+          }
           return SelectDropList(
             itemSelected: optionItemSelected,
             dropListModel: workspaces,

@@ -5,12 +5,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pma_dclv/data/models/task/task_model.dart';
 import 'package:pma_dclv/theme/theme.dart';
 import 'package:pma_dclv/views/routes/route_name.dart';
+import 'package:pma_dclv/views/widgets/card/project/no_project_card.dart';
+import 'package:pma_dclv/views/widgets/card/task/no_task_card.dart';
 import 'package:pma_dclv/views/widgets/card/project_card.dart';
-import 'package:pma_dclv/views/widgets/card/task_card.dart';
 
 import '../../data/models/project/project_model.dart';
 import '../../view-model/projects/project_cubit.dart';
 import '../../view-model/tasks/task_cubit.dart';
+import '../widgets/card/task/task_card.dart';
 
 class MyOverView extends StatefulWidget {
   const MyOverView({
@@ -59,7 +61,7 @@ class _MyOverViewState extends State<MyOverView> {
                 if (projectList.isNotEmpty) {
                   return MyProjectCard(project: projectList[0]);
                 } else {
-                  return Container();
+                  return NoProjectCard();
                 }
               } else if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
@@ -93,7 +95,7 @@ class _MyOverViewState extends State<MyOverView> {
                     return Container(
                       decoration: const BoxDecoration(
                         color: white,
-                      ),
+                      ), // Add white background color
                       child: ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
@@ -114,7 +116,15 @@ class _MyOverViewState extends State<MyOverView> {
                       ),
                     );
                   } else {
-                    return Container();
+                    // If the list is empty, display a Container with white background
+                    return Container(
+                      decoration: const BoxDecoration(
+                        color: white,
+                      ), // Add white background color
+                      child: const Center(
+                        child: NoTaskCard(),
+                      ),
+                    );
                   }
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');

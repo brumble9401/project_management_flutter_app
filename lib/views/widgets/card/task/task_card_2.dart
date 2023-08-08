@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 
-import '../../../data/models/task/task_model.dart';
-import '../../../theme/theme.dart';
+import '../../../../data/models/task/task_model.dart';
+import '../../../../theme/theme.dart';
 
 class MyTaskCard2 extends StatefulWidget {
   const MyTaskCard2({super.key, required this.task, this.onPressed});

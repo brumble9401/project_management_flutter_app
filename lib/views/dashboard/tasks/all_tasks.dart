@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pma_dclv/data/models/task/task_model.dart';
 import 'package:pma_dclv/views/routes/route_name.dart';
-import 'package:pma_dclv/views/widgets/card/task_card_2.dart';
+
+import '../../widgets/card/task/task_card_2.dart';
 
 class MyAllTasks extends StatefulWidget {
   const MyAllTasks({super.key, required this.tasks});

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../data/models/task/task_model.dart';
-import '../../widgets/card/task_card_2.dart';
+import '../../widgets/card/task/task_card_2.dart';
 
 class MyCompletedTasks extends StatefulWidget {
   const MyCompletedTasks({super.key, required this.tasks});

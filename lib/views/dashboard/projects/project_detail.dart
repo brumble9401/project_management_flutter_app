@@ -15,8 +15,6 @@ import 'package:pma_dclv/view-model/user/user_cubit.dart';
 import 'package:pma_dclv/views/routes/route_name.dart';
 import 'package:pma_dclv/views/widgets/bottomModalSheet/bottom_modal_sheet.dart';
 import 'package:pma_dclv/views/widgets/card/comment_card.dart';
-import 'package:pma_dclv/views/widgets/card/task_add_card.dart';
-import 'package:pma_dclv/views/widgets/card/task_card_2.dart';
 import 'package:pma_dclv/views/widgets/comment_box.dart';
 
 import '../../../data/models/comment/comment_model.dart';
@@ -27,6 +25,8 @@ import '../../../view-model/tasks/task_cubit.dart';
 import '../../widgets/appbar/non_title_appbar.dart';
 import '../../widgets/card/file_card.dart';
 import '../../widgets/card/images_add_card.dart';
+import '../../widgets/card/task/task_add_card.dart';
+import '../../widgets/card/task/task_card_2.dart';
 
 class MyProjectDetail extends StatefulWidget {
   const MyProjectDetail({super.key, required this.project_id});
