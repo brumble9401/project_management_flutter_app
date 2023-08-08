@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -6,8 +8,10 @@ import 'package:intl/intl.dart';
 import 'package:pma_dclv/data/models/network/base_response.dart';
 import 'package:pma_dclv/data/models/project/project_model.dart';
 import 'package:pma_dclv/data/models/user/user_model.dart';
+import 'package:pma_dclv/data/models/workspaces/workspace.dart';
 import 'package:pma_dclv/view-model/projects/project_cubit.dart';
 import 'package:pma_dclv/view-model/user/user_cubit.dart';
+import 'package:pma_dclv/view-model/workspace/workspace_cubit.dart';
 import 'package:pma_dclv/views/routes/route_name.dart';
 import 'package:pma_dclv/views/widgets/button/button.dart';
 
@@ -16,9 +20,14 @@ import '../button/iconButton.dart';
 import '../inputBox.dart';
 
 class MyProjectBottomModalSheet extends StatefulWidget {
-  const MyProjectBottomModalSheet({super.key, required this.title});
+  const MyProjectBottomModalSheet({
+    super.key,
+    required this.title,
+    required this.workspaceUid,
+  });
 
   final String title;
+  final String workspaceUid;
 
   @override
   State<MyProjectBottomModalSheet> createState() =>
@@ -31,8 +40,9 @@ class _MyProjectBottomModalSheetState extends State<MyProjectBottomModalSheet> {
   DateTime deadline = DateTime.now();
   List<UserModel> users = [];
   List<int> usersId = [];
-
+  String user_uid = FirebaseAuth.instance.currentUser!.uid.toString();
   BaseResponse<ProjectModel> project = BaseResponse<ProjectModel>();
+  String projectUid = "";
 
   @override
   void dispose() {
@@ -43,222 +53,261 @@ class _MyProjectBottomModalSheetState extends State<MyProjectBottomModalSheet> {
 
   void createProject() async {
     Map<String, dynamic> project = ({
-      "name": _nameController.text,
+      "project_name": _nameController.text,
       "description": _descriptionController.text,
-      "deadline": DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(deadline),
-      "member": [1, 2],
-      "workspace": 1,
-      "finish": false,
+      "deadline": Timestamp.fromDate(deadline),
+      "users_id": [user_uid],
+      "created_date": Timestamp.fromDate(DateTime.now()),
+      "workspace_id": widget.workspaceUid,
+      "state": "inprogress",
+      "finished_time": Timestamp.fromDate(DateTime.now()),
     });
+
+    projectUid = await context.read<ProjectCubit>().createProject(project);
   }
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    return Container(
-      decoration: BoxDecoration(
-        color: white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.w)),
-      ),
-      child: SizedBox(
-        height: screenHeight * 0.85,
-        child: Padding(
-          padding: EdgeInsets.all(20.h),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 20.h),
-                    child: Center(
-                      child: Text(
-                        widget.title,
-                        style: TextStyle(
-                          color: neutral_dark,
-                          fontSize: 20.sp,
-                          fontWeight: FontWeight.bold,
+    return StreamBuilder<WorkspaceModel>(
+        stream: context
+            .read<WorkspaceCubit>()
+            .getWorkspaceFromUid(widget.workspaceUid),
+        builder: (context, snapshot) {
+          return Container(
+            decoration: BoxDecoration(
+              color: white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20.w)),
+            ),
+            child: SizedBox(
+              height: screenHeight * 0.85,
+              child: Padding(
+                padding: EdgeInsets.all(20.h),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 10.h),
+                          child: Center(
+                            child: Text(
+                              widget.title,
+                              style: TextStyle(
+                                color: neutral_dark,
+                                fontSize: 20.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
-                  Text(
-                    "Name",
-                    style: TextStyle(
-                      color: neutral_dark,
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10.h,
-                  ),
-                  InputBox(
-                    controller: _nameController,
-                  ),
-                  SizedBox(
-                    height: 15.h,
-                  ),
-                  Text(
-                    "Member",
-                    style: TextStyle(
-                      color: neutral_dark,
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10.h,
-                  ),
-                  BlocConsumer<UserCubit, UserState>(
-                    listener: (context, state) {
-                      // TODO: implement listener
-                    },
-                    builder: (context, state) {
-                      if (state.userStatus == UserStatus.loading) {
-                        return const CircularProgressIndicator();
-                      }
-                      return SizedBox(
-                        height: 40.w,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: usersId.length + 1,
-                          itemBuilder: (context, index) {
-                            if (index == usersId.length) {
-                              return Container(
-                                width: 40.w,
-                                height: 40.w,
-                                decoration: BoxDecoration(
-                                  color: white,
-                                  border: Border.all(
-                                    color: neutral_lightgrey,
-                                    style: BorderStyle.solid,
-                                  ),
-                                  shape: BoxShape.circle,
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 20.h),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Workspace: ",
+                                style: TextStyle(
+                                  color: neutral_grey,
+                                  fontSize: 13.sp,
                                 ),
-                                child: OutlinedButton(
-                                  onPressed: () {},
-                                  style: ButtonStyle(
-                                      shape: MaterialStateProperty.all<
-                                              RoundedRectangleBorder>(
-                                          RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(40.w),
+                              ),
+                              snapshot.hasData
+                                  ? Text(
+                                      snapshot.data!.workspaceName!,
+                                      style: TextStyle(
+                                        color: primary,
+                                        fontSize: 13.sp,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
+                                  : const Center(
+                                      child: CircularProgressIndicator(),
                                     ),
-                                  ))),
-                                  child: Icon(
-                                    FontAwesomeIcons.plus,
-                                    color: neutral_grey,
-                                    size: 10.sp,
-                                  ),
-                                ), // Add your content here
-                              );
+                            ],
+                          ),
+                        ),
+                        Text(
+                          "Name",
+                          style: TextStyle(
+                            color: neutral_dark,
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10.h,
+                        ),
+                        InputBox(
+                          controller: _nameController,
+                        ),
+                        SizedBox(
+                          height: 15.h,
+                        ),
+                        Text(
+                          "Member",
+                          style: TextStyle(
+                            color: neutral_dark,
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10.h,
+                        ),
+                        BlocConsumer<UserCubit, UserState>(
+                          listener: (context, state) {
+                            // TODO: implement listener
+                          },
+                          builder: (context, state) {
+                            if (state.userStatus == UserStatus.loading) {
+                              return const CircularProgressIndicator();
                             }
-                            return Padding(
-                              padding: EdgeInsets.only(right: 10.w),
-                              child: Container(
-                                width: 40.w,
-                                // height: ,
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const CircleAvatar(
-                                  radius: 50,
-                                  backgroundImage:
-                                      AssetImage('assets/images/dog.png'),
-                                ),
+                            return SizedBox(
+                              height: 40.w,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: usersId.length + 1,
+                                itemBuilder: (context, index) {
+                                  if (index == usersId.length) {
+                                    return Container(
+                                      width: 40.w,
+                                      height: 40.w,
+                                      decoration: BoxDecoration(
+                                        color: white,
+                                        border: Border.all(
+                                          color: neutral_lightgrey,
+                                          style: BorderStyle.solid,
+                                        ),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: OutlinedButton(
+                                        onPressed: () {},
+                                        style: ButtonStyle(
+                                            shape: MaterialStateProperty.all<
+                                                    RoundedRectangleBorder>(
+                                                RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(40.w),
+                                          ),
+                                        ))),
+                                        child: Icon(
+                                          FontAwesomeIcons.plus,
+                                          color: neutral_grey,
+                                          size: 10.sp,
+                                        ),
+                                      ), // Add your content here
+                                    );
+                                  }
+                                  return Padding(
+                                    padding: EdgeInsets.only(right: 10.w),
+                                    child: Container(
+                                      width: 40.w,
+                                      // height: ,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const CircleAvatar(
+                                        radius: 50,
+                                        backgroundImage:
+                                            AssetImage('assets/images/dog.png'),
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
                             );
                           },
                         ),
-                      );
-                    },
-                  ),
-                  SizedBox(
-                    height: 15.h,
-                  ),
-                  Text(
-                    "Deadline",
-                    style: TextStyle(
-                      color: neutral_dark,
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10.h,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildDueDate(DateFormat.yMMMd().format(deadline),
-                          primary, DateFormat.jm().format(deadline)),
-                      IconBtn(
-                        onPressed: () {
-                          showDateTimePicker();
-                        },
-                        icon: Icon(
-                          Icons.calendar_today,
-                          color: white,
-                          size: 14.sp,
+                        SizedBox(
+                          height: 15.h,
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 15.h,
-                  ),
-                  Text(
-                    "Description",
-                    style: TextStyle(
-                      color: neutral_dark,
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.bold,
+                        Text(
+                          "Deadline",
+                          style: TextStyle(
+                            color: neutral_dark,
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10.h,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _buildDueDate(DateFormat.yMMMd().format(deadline),
+                                primary, DateFormat.jm().format(deadline)),
+                            IconBtn(
+                              onPressed: () {
+                                showDateTimePicker();
+                              },
+                              icon: Icon(
+                                Icons.calendar_today,
+                                color: white,
+                                size: 14.sp,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 15.h,
+                        ),
+                        Text(
+                          "Description",
+                          style: TextStyle(
+                            color: neutral_dark,
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10.h,
+                        ),
+                        InputBox(
+                          controller: _descriptionController,
+                        ),
+                        SizedBox(
+                          height: 20.h,
+                        ),
+                      ],
                     ),
-                  ),
-                  SizedBox(
-                    height: 10.h,
-                  ),
-                  InputBox(
-                    controller: _descriptionController,
-                  ),
-                  SizedBox(
-                    height: 20.h,
-                  ),
-                ],
-              ),
-              Padding(
-                padding: EdgeInsets.only(bottom: 10.h),
-                child: BlocConsumer<ProjectCubit, ProjectState>(
-                  listener: (context, state) {
-                    if (state.projectStatus == ProjectStatus.success) {
-                      Navigator.pushReplacementNamed(
-                          context, RouteName.project_detail,
-                          arguments: project.data!.id.toString());
-                    }
-                  },
-                  builder: (context, state) {
-                    if (state.projectStatus == ProjectStatus.loading) {
-                      return Button(
-                        onPressed: () {},
-                        title: "Creating ...",
-                      );
-                    }
-                    return Button(
-                      onPressed: () {
-                        createProject();
-                      },
-                      title: "Create",
-                    );
-                  },
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 10.h),
+                      child: BlocConsumer<ProjectCubit, ProjectState>(
+                        listener: (context, state) {
+                          if (state.projectStatus == ProjectStatus.success) {
+                            Navigator.pushReplacementNamed(
+                              context,
+                              RouteName.project_detail,
+                              arguments: projectUid,
+                            );
+                          }
+                        },
+                        builder: (context, state) {
+                          if (state.projectStatus == ProjectStatus.loading) {
+                            return Button(
+                              onPressed: () {},
+                              title: "Creating ...",
+                            );
+                          }
+                          return Button(
+                            onPressed: () {
+                              createProject();
+                            },
+                            title: "Create",
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
-    );
+            ),
+          );
+        });
   }
 
   void showDateTimePicker() async {

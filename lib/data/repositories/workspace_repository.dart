@@ -19,4 +19,12 @@ class WorkspaceRepository {
       yield workspaces;
     }
   }
+
+  Stream<WorkspaceModel> getWorkspaceFromUid(String userId) async* {
+    final Stream<WorkspaceModel> workspaceStream =
+        _workspaceRemoteSource.getWorkspaceFromUid(userId);
+    await for (final WorkspaceModel workspace in workspaceStream) {
+      yield workspace;
+    }
+  }
 }

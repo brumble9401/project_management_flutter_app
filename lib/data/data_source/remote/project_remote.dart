@@ -12,6 +12,8 @@ abstract class ProjectRemote {
 
   Stream<ProjectModel?> getProjectFromUid(String projectUid);
 
+  Future<String> createProject(Map<String, dynamic> project);
+
   Future<void> addUserToCollection(List<String> userIds, String projectId);
 }
 
@@ -118,6 +120,22 @@ class ProjectRemoteSource extends ProjectRemote {
     } catch (e) {
       print('Error fetching project: $e');
       return Stream.error(e);
+    }
+  }
+
+  @override
+  Future<String> createProject(Map<String, dynamic> project) async {
+    try {
+      final CollectionReference<Map<String, dynamic>> projectRef =
+          FirebaseFirestore.instance.collection('projects');
+      final DocumentReference<Map<String, dynamic>> newProjectRef =
+          await projectRef.add(project);
+      print('New project created successfully}!');
+      print(newProjectRef.id);
+      return newProjectRef.id;
+    } catch (e) {
+      print('Error creating project: $e');
+      return "";
     }
   }
 

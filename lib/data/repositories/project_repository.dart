@@ -41,4 +41,8 @@ class ProjectRepository {
       List<String> userIds, String projectId) async {
     _projectRemoteSource.addUserToCollection(userIds, projectId);
   }
+
+  Future<String> createProject(Map<String, dynamic> project) async {
+    return await _projectRemoteSource.createProject(project);
+  }
 }

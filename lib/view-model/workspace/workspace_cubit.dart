@@ -22,4 +22,15 @@ class WorkspaceCubit extends Cubit<WorkspaceState> {
       LogUtil.error("Fetch workspace error: ", error: e);
     }
   }
+
+  Stream<WorkspaceModel> getWorkspaceFromUid(String uid) async* {
+    try {
+      emit(state.copyWith(workspaceStatus: WorkspaceStatus.loading));
+      yield* _workspaceRepository.getWorkspaceFromUid(uid);
+      emit(state.copyWith(workspaceStatus: WorkspaceStatus.success));
+      LogUtil.info("Fetch workspace success");
+    } catch (e) {
+      LogUtil.error("Fetch workspace error: ", error: e);
+    }
+  }
 }

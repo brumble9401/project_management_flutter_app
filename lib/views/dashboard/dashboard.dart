@@ -77,8 +77,22 @@ class _MyDashBoardState extends State<MyDashBoard> {
                       create: (context) => UserCubit(),
                     ),
                   ],
-                  child: const MyProjectBottomModalSheet(
-                    title: "Create Project",
+                  child: MultiBlocProvider(
+                    providers: [
+                      BlocProvider(
+                        create: (context) => WorkspaceCubit(),
+                      ),
+                      BlocProvider(
+                        create: (context) => ProjectCubit(),
+                      ),
+                      BlocProvider(
+                        create: (context) => UserCubit(),
+                      ),
+                    ],
+                    child: MyProjectBottomModalSheet(
+                      title: "Create Project",
+                      workspaceUid: workspaceUid.toString(),
+                    ),
                   ),
                 ),
               ),

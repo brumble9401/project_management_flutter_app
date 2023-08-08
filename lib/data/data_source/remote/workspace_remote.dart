@@ -5,14 +5,17 @@ import 'package:pma_dclv/data/models/workspaces/workspace.dart';
 
 abstract class WorkspaceRemote {
   Stream<List<WorkspaceModel>> getWorkspaceFromUser(String userId);
+
+  Stream<WorkspaceModel> getWorkspaceFromUid(String uid);
 }
 
 class WorkspaceRemoteSource extends WorkspaceRemote {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   @override
   Stream<List<WorkspaceModel>> getWorkspaceFromUser(String userId) {
     final StreamController<List<WorkspaceModel>> controller =
         StreamController<List<WorkspaceModel>>();
-    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
     try {
       final Query query = _firestore
@@ -38,5 +41,30 @@ class WorkspaceRemoteSource extends WorkspaceRemote {
       controller.addError(e);
     }
     return controller.stream;
+  }
+
+  @override
+  Stream<WorkspaceModel> getWorkspaceFromUid(String uid) {
+    try {
+      final DocumentReference<Map<String, dynamic>> docRef =
+          _firestore.collection('workspaces').doc(uid);
+
+      return docRef.snapshots().map((snapshot) {
+        if (snapshot.exists) {
+          print(snapshot);
+          return WorkspaceModel(
+            uid: snapshot.id,
+            workspaceName: snapshot['workspace_name'] ?? '',
+            userIds: List<String>.from(snapshot['users_id'] ?? []),
+            workspaceLeaderId: List<String>.from(snapshot['leaders_id'] ?? []),
+          );
+        } else {
+          return WorkspaceModel();
+        }
+      });
+    } catch (e) {
+      print('Error fetching project: $e');
+      return Stream.error(e);
+    }
   }
 }

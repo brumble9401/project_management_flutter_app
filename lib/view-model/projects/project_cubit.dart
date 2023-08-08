@@ -46,6 +46,19 @@ class ProjectCubit extends Cubit<ProjectState> {
     }
   }
 
+  Future<String> createProject(Map<String, dynamic> project) async {
+    try {
+      emit(state.copyWith(projectStatus: ProjectStatus.loading));
+      String uid = await _projectRepository.createProject(project);
+      emit(state.copyWith(projectStatus: ProjectStatus.success));
+      LogUtil.info("Create task successfully");
+      return uid;
+    } catch (e) {
+      LogUtil.error("Create task failed", error: e);
+      return "";
+    }
+  }
+
   Future<void> addUserToCollection(
       List<String> userIds, String projectId) async {
     try {
