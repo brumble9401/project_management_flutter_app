@@ -20,6 +20,15 @@ class ProjectRepository {
     }
   }
 
+  Stream<List<ProjectModel>> getProjectFromWorkspaceUid(
+      String userUid, String workspaceUid) async* {
+    final Stream<List<ProjectModel>> projectStream =
+        _projectRemoteSource.getProjectFromWorkspaceUid(userUid, workspaceUid);
+    await for (final List<ProjectModel> projects in projectStream) {
+      yield projects;
+    }
+  }
+
   Stream<ProjectModel> getProjectFromUid(String projectUid) async* {
     final Stream<ProjectModel> projectStream =
         _projectRemoteSource.getProjectFromUid(projectUid);

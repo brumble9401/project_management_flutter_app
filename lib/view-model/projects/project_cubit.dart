@@ -22,6 +22,19 @@ class ProjectCubit extends Cubit<ProjectState> {
     }
   }
 
+  Stream<List<ProjectModel>> getProjectFromWorkspaceUid(
+      String userUid, String workspaceUid) async* {
+    try {
+      emit(state.copyWith(projectStatus: ProjectStatus.loading));
+      yield* _projectRepository.getProjectFromWorkspaceUid(
+          userUid, workspaceUid);
+      emit(state.copyWith(projectStatus: ProjectStatus.success));
+      LogUtil.info("Fetch project success");
+    } catch (e) {
+      LogUtil.error("Fetch project error: ", error: e);
+    }
+  }
+
   Stream<ProjectModel> getProjectFromUid(String projectUid) async* {
     try {
       emit(state.copyWith(projectStatus: ProjectStatus.loading));

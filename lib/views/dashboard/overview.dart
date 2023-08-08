@@ -53,8 +53,8 @@ class _MyOverViewState extends State<MyOverView> {
             height: 6.h,
           ),
           StreamBuilder<List<ProjectModel>>(
-            stream:
-                context.read<ProjectCubit>().getProjectFromFirestore(user_uid),
+            stream: context.read<ProjectCubit>().getProjectFromWorkspaceUid(
+                user_uid, widget.workspaceUid.toString()),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 final List<ProjectModel> projectList = snapshot.data!;
