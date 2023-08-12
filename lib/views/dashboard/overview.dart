@@ -37,31 +37,85 @@ class _MyOverViewState extends State<MyOverView> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(color: white),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CustomTextButton(
-            onPressed: () {
-              Navigator.pushNamed(context, RouteName.projects);
-            },
-            title: "Your projects",
-            icon_url: "assets/icons/Project.png",
-          ),
-          SizedBox(
-            height: 6.h,
-          ),
-          StreamBuilder<List<ProjectModel>>(
-            stream: context.read<ProjectCubit>().getProjectFromWorkspaceUid(
+    return Column(
+      children: [
+        CustomTextButton(
+          onPressed: () {
+            Navigator.pushNamed(context, RouteName.projects);
+          },
+          title: "Your projects",
+          icon_url: "assets/icons/Project.png",
+        ),
+        SizedBox(
+          height: 6.h,
+        ),
+        StreamBuilder<List<ProjectModel>>(
+          stream: context.read<ProjectCubit>().getProjectFromWorkspaceUid(
+              user_uid, widget.workspaceUid.toString()),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              final List<ProjectModel> projectList = snapshot.data!;
+              if (projectList.isNotEmpty) {
+                return MyProjectCard(project: projectList[0]);
+              } else {
+                return const NoProjectCard();
+              }
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              return const CircularProgressIndicator();
+            }
+          },
+        ),
+        SizedBox(
+          height: 10.h,
+        ),
+        CustomTextButton(
+          onPressed: () {
+            Navigator.pushNamed(context, RouteName.tasks);
+          },
+          title: "Your tasks",
+          icon_url: "assets/icons/Task.png",
+        ),
+        SizedBox(
+          height: 6.h,
+        ),
+        Container(
+          decoration: const BoxDecoration(color: white),
+          child: StreamBuilder<List<TaskModel>>(
+            stream: context.read<TaskCubit>().getAllTaskFromWorkspace(
                 user_uid, widget.workspaceUid.toString()),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                final List<ProjectModel> projectList = snapshot.data!;
-                if (projectList.isNotEmpty) {
-                  return MyProjectCard(project: projectList[0]);
+                final List<TaskModel> taskList = snapshot.data!;
+                if (taskList.isNotEmpty) {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: taskList.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: 10.h),
+                        child: MyTaskCard(
+                          task: taskList[index],
+                          onPressed: () {
+                            Navigator.pushNamed(context, RouteName.task_detail,
+                                arguments: taskList[index].id);
+                          },
+                        ),
+                      );
+                    },
+                  );
                 } else {
-                  return const NoProjectCard();
+                  // If the list is empty, display a Container with white background
+                  return Container(
+                    decoration: const BoxDecoration(
+                      color: white,
+                    ), // Add white background color
+                    child: const Center(
+                      child: NoTaskCard(),
+                    ),
+                  );
                 }
               } else if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
@@ -70,75 +124,11 @@ class _MyOverViewState extends State<MyOverView> {
               }
             },
           ),
-          SizedBox(
-            height: 10.h,
-          ),
-          CustomTextButton(
-            onPressed: () {
-              Navigator.pushNamed(context, RouteName.tasks);
-            },
-            title: "Your tasks",
-            icon_url: "assets/icons/Task.png",
-          ),
-          SizedBox(
-            height: 6.h,
-          ),
-          Flexible(
-            fit: FlexFit.loose,
-            child: StreamBuilder<List<TaskModel>>(
-              stream: context.read<TaskCubit>().getAllTaskFromWorkspace(
-                  user_uid, widget.workspaceUid.toString()),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final List<TaskModel> taskList = snapshot.data!;
-                  if (taskList.isNotEmpty) {
-                    return Container(
-                      decoration: const BoxDecoration(
-                        color: white,
-                      ), // Add white background color
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: taskList.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: EdgeInsets.only(bottom: 10.h),
-                            child: MyTaskCard(
-                              task: taskList[index],
-                              onPressed: () {
-                                Navigator.pushNamed(
-                                    context, RouteName.task_detail,
-                                    arguments: taskList[index].id);
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                    );
-                  } else {
-                    // If the list is empty, display a Container with white background
-                    return Container(
-                      decoration: const BoxDecoration(
-                        color: white,
-                      ), // Add white background color
-                      child: const Center(
-                        child: NoTaskCard(),
-                      ),
-                    );
-                  }
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else {
-                  return const CircularProgressIndicator();
-                }
-              },
-            ),
-          ),
-          SizedBox(
-            height: 10.h,
-          ),
-        ],
-      ),
+        ),
+        SizedBox(
+          height: 10.h,
+        ),
+      ],
     );
   }
 }

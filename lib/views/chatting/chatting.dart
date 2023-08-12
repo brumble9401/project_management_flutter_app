@@ -13,7 +13,8 @@ import 'package:pma_dclv/views/routes/route_name.dart';
 import 'package:pma_dclv/views/widgets/appbar/default_appbar.dart';
 import 'package:pma_dclv/views/widgets/card/chat_card.dart';
 import 'package:pma_dclv/views/widgets/inputBox.dart';
-import 'package:pma_dclv/views/widgets/loading/shrimmer_loading.dart';
+import 'package:pma_dclv/views/widgets/loading/chat_shimmer.dart';
+import 'package:shimmer/shimmer.dart';
 
 class MyChatPage extends StatefulWidget {
   const MyChatPage({super.key});
@@ -75,15 +76,9 @@ class _MyChatPageState extends State<MyChatPage> {
                                       if (snap.hasData) {
                                         List<UserModel> users = snap.data!;
                                         // return buidChatAva(users);
-                                        return ShimmerLoading(
-                                          isLoading: false,
-                                          child: buidChatAva(users),
-                                        );
+                                        return buidChatAva(users);
                                       } else {
-                                        return ShimmerLoading(
-                                          isLoading: true,
-                                          child: buidChatAva([]),
-                                        );
+                                        return buidChatAva([]);
                                       }
                                     },
                                   ),
@@ -110,9 +105,7 @@ class _MyChatPageState extends State<MyChatPage> {
                                         },
                                       );
                                     } else {
-                                      return const Center(
-                                        child: CircularProgressIndicator(),
-                                      );
+                                      return const ShimmerList();
                                     }
                                   },
                                 ),
@@ -208,8 +201,36 @@ class _MyChatPageState extends State<MyChatPage> {
                 ),
               );
             } else {
-              return const Center(
-                child: CircularProgressIndicator(),
+              return Shimmer.fromColors(
+                baseColor: neutral_lightgrey,
+                highlightColor: neutral_grey,
+                child: ListView.builder(
+                  itemCount: 6,
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: EdgeInsets.only(right: 15.w),
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 50.w,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: neutral_grey),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(top: 8.h, bottom: 8.h),
+                            child: Container(
+                              height: 10.h,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               );
             }
           },
