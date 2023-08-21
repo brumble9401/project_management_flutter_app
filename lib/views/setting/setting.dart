@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pma_dclv/data/models/workspaces/workspace.dart';
 import 'package:pma_dclv/theme/theme.dart';
+import 'package:pma_dclv/view-model/user/user_cubit.dart';
 import 'package:pma_dclv/view-model/workspace/workspace_cubit.dart';
 import 'package:pma_dclv/views/widget_tree.dart';
 import 'package:pma_dclv/views/widgets/appbar/default_appbar.dart';
@@ -12,7 +13,7 @@ import 'package:pma_dclv/views/widgets/button/text_icon_button.dart';
 import 'package:pma_dclv/views/widgets/card/workspace_card.dart';
 
 import '../../view-model/authentication/auth_cubit.dart';
-import '../widgets/card/user_card.dart';
+import 'user_card.dart';
 
 class MySettingPage extends StatefulWidget {
   const MySettingPage({super.key});
@@ -50,10 +51,14 @@ class _MySettingPageState extends State<MySettingPage> {
                       width: double.infinity,
                       height: 70.h,
                       decoration: BoxDecoration(
-                        // border: Border.all(color: neutral_lightgrey),
                         borderRadius: BorderRadius.all(Radius.circular(10.h)),
                       ),
-                      child: const MyUserCard(),
+                      child: BlocProvider(
+                        create: (context) => UserCubit(),
+                        child: MyUserCard(
+                          userUid: _auth.currentUser!.uid.toString(),
+                        ),
+                      ),
                     ),
                   ),
                   Padding(

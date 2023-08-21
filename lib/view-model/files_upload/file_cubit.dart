@@ -78,4 +78,27 @@ class UploadCubit extends Cubit<String> {
         .collection('files')
         .snapshots();
   }
+
+  Future<void> uploadAvatar(File file, String fileName, String userUid) async {
+    final storage = firebase_storage.FirebaseStorage.instance;
+
+    try {
+      // Upload the file to Firebase Cloud Storage
+      final ref = storage.ref().child(fileName);
+      final uploadTask = ref.putFile(file);
+      await uploadTask.whenComplete(() => null);
+
+      // Get the download URL of the uploaded file
+      final downloadURL = await ref.getDownloadURL();
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userUid)
+          .update({'avatar': downloadURL});
+
+      print('File uploaded and added to collection successfully.');
+    } catch (e) {
+      print('Error uploading file and adding to collection: $e');
+    }
+  }
 }

@@ -19,6 +19,7 @@ import 'package:pma_dclv/views/onBoarding.dart';
 import 'package:pma_dclv/views/routes/route_name.dart';
 import 'package:pma_dclv/views/authentication/signin.dart';
 import 'package:pma_dclv/views/authentication/signup.dart';
+import 'package:pma_dclv/views/setting/profile.dart';
 import 'package:pma_dclv/views/widget_tree.dart';
 
 import '../../view-model/authentication/auth_cubit.dart';
@@ -173,6 +174,21 @@ class RouteGenerator {
             uids: ids,
           ),
         );
+        break;
+
+      case RouteName.profile:
+        page = MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) => UserCubit(),
+            ),
+            BlocProvider(
+              create: (context) => UploadCubit(),
+            ),
+          ],
+          child: const ProfilePage(),
+        );
+        break;
     }
 
     return _getPageRoute(page, settings);

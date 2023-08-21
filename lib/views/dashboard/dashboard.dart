@@ -101,31 +101,37 @@ class _MyDashBoardState extends State<MyDashBoard> {
               decoration: const BoxDecoration(
                 color: white,
               ),
-              child: SingleChildScrollView(
-                child: Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.only(top: 20.h),
-                  decoration: const BoxDecoration(
-                    color: white,
-                  ),
-                  child: Column(
-                    children: [
-                      _buildDropdown(),
-                      MyDashboardTab(
-                        page: _page,
-                        onChangePage: onChangePage,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.only(top: 20.h),
+                        decoration: const BoxDecoration(
+                          color: white,
+                        ),
+                        child: Column(
+                          children: [
+                            _buildDropdown(),
+                            MyDashboardTab(
+                              page: _page,
+                              onChangePage: onChangePage,
+                            ),
+                            SizedBox(
+                              height: 10.w,
+                            ),
+                            _page == 0
+                                ? MyOverView(
+                                    workspaceUid: workspaceUid,
+                                  )
+                                : const MyAnalytics(),
+                          ],
+                        ),
                       ),
-                      SizedBox(
-                        height: 10.w,
-                      ),
-                      _page == 0
-                          ? MyOverView(
-                              workspaceUid: workspaceUid,
-                            )
-                          : const MyAnalytics(),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           ),

@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pma_dclv/data/models/chat/chat_room.dart';
+import 'package:pma_dclv/data/models/user/user_model.dart';
 import 'package:pma_dclv/theme/theme.dart';
 import 'package:pma_dclv/view-model/chat/chat_cubit.dart';
-import 'package:pma_dclv/views/widgets/appbar/center_title_appbar.dart';
+import 'package:pma_dclv/view-model/user/user_cubit.dart';
 import 'package:pma_dclv/views/widgets/inputBox.dart';
 
 class ChatRoomPage extends StatefulWidget {
@@ -43,20 +44,67 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       child: SafeArea(
         child: Padding(
           padding: EdgeInsets.only(top: 10.h, left: 20.w, right: 20.w),
-          child: Scaffold(
-            appBar: MyCenterTitleAppBar(
-              title: "John doe",
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            body: StreamBuilder<ChatRoom>(
-              stream: context
-                  .read<ChatCubit>()
-                  .getRoomFromRoomUid(widget.chatRoomUid),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Column(
+          child: StreamBuilder<ChatRoom>(
+            stream: context
+                .read<ChatCubit>()
+                .getRoomFromRoomUid(widget.chatRoomUid),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                String friendUid = snapshot.data!.users!
+                    .firstWhere((element) => element != userUid);
+                return Scaffold(
+                  appBar: AppBar(
+                    automaticallyImplyLeading: false,
+                    titleSpacing: 0,
+                    backgroundColor: white,
+                    centerTitle: false,
+                    shadowColor: Colors.transparent,
+                    title: Row(
+                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: Icon(
+                            Icons.chevron_left,
+                            color: neutral_dark,
+                            size: 19.sp,
+                          ),
+                        ),
+                        StreamBuilder<UserModel>(
+                            stream: context
+                                .read<UserCubit>()
+                                .getUserFromUid(friendUid),
+                            builder: (context, userSnap) {
+                              if (userSnap.hasData) {
+                                return Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 19.w,
+                                      backgroundImage:
+                                          AssetImage("assets/images/dog.png"),
+                                      backgroundColor: Colors.transparent,
+                                    ),
+                                    SizedBox(
+                                      width: 10.w,
+                                    ),
+                                    Text(
+                                      "${userSnap.data!.firstName} ${userSnap.data!.lastName}",
+                                      style: TextStyle(
+                                        color: neutral_dark,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18.sp,
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              } else {
+                                return const CircularProgressIndicator();
+                              }
+                            }),
+                      ],
+                    ),
+                  ),
+                  body: Column(
                     children: [
                       Expanded(
                         child: Container(
@@ -123,14 +171,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                         ),
                       ),
                     ],
-                  );
-                } else {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-              },
-            ),
+                  ),
+                );
+              } else {
+                return CircularProgressIndicator();
+              }
+            },
           ),
         ),
       ),
@@ -158,10 +204,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                   ),
           ),
           padding: const EdgeInsets.all(12.0),
-          child: Text(
-            content,
-            style: TextStyle(
-              color: isMe ? Colors.white : Colors.black,
+          child: Container(
+            child: Text(
+              content,
+              style: TextStyle(
+                color: isMe ? Colors.white : Colors.black,
+              ),
             ),
           ),
         ),

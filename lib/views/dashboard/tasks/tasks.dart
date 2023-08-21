@@ -62,52 +62,58 @@ class _MyTaskViewState extends State<MyTaskView> {
               title: "Tasks",
               hasIconButton: true,
             ),
-            body: SingleChildScrollView(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: white,
-                ),
-                padding: EdgeInsets.only(top: 20.h),
-                child: Column(
-                  children: [
-                    const InputBox(label: "Search"),
-                    SizedBox(
-                      height: 17.w,
+            body: Container(
+              decoration: const BoxDecoration(color: white),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Container(
+                        padding: EdgeInsets.only(top: 20.h),
+                        child: Column(
+                          children: [
+                            const InputBox(label: "Search"),
+                            SizedBox(
+                              height: 17.w,
+                            ),
+                            MyTaskTab(
+                              page: _page,
+                              onChangePage: onChangePage,
+                            ),
+                            SizedBox(
+                              height: 17.w,
+                            ),
+                            StreamBuilder<List<TaskModel>>(
+                              stream: context
+                                  .read<TaskCubit>()
+                                  .getAllTaskFromFirestore(user_uid),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  final List<TaskModel> tasks = snapshot.data!;
+                                  if (tasks.isNotEmpty) {
+                                    return _page == 0
+                                        ? MyAllTasks(
+                                            tasks: tasks,
+                                          )
+                                        : MyCompletedTasks(
+                                            tasks: tasks,
+                                          );
+                                  } else {
+                                    return Container();
+                                  }
+                                } else if (snapshot.hasError) {
+                                  return Text('Error: ${snapshot.error}');
+                                } else {
+                                  return CircularProgressIndicator();
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    MyTaskTab(
-                      page: _page,
-                      onChangePage: onChangePage,
-                    ),
-                    SizedBox(
-                      height: 17.w,
-                    ),
-                    StreamBuilder<List<TaskModel>>(
-                      stream: context
-                          .read<TaskCubit>()
-                          .getAllTaskFromFirestore(user_uid),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          final List<TaskModel> tasks = snapshot.data!;
-                          if (tasks.isNotEmpty) {
-                            return _page == 0
-                                ? MyAllTasks(
-                                    tasks: tasks,
-                                  )
-                                : MyCompletedTasks(
-                                    tasks: tasks,
-                                  );
-                          } else {
-                            return Container();
-                          }
-                        } else if (snapshot.hasError) {
-                          return Text('Error: ${snapshot.error}');
-                        } else {
-                          return CircularProgressIndicator();
-                        }
-                      },
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

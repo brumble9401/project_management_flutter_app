@@ -11,4 +11,6 @@ class RouteName {
   static const chat_room = "/chat_room";
   static const add_user = "/add_user";
   static const members = "/members";
+
+  static const profile = "/profile";
 }

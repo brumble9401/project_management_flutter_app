@@ -53,51 +53,55 @@ class _MyProjectViewState extends State<MyProjectView> {
             ),
             body: Container(
               decoration: const BoxDecoration(color: white),
-              child: SingleChildScrollView(
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: white,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Container(
+                        padding: EdgeInsets.only(top: 20.h),
+                        child: Column(
+                          children: [
+                            const InputBox(label: "Search"),
+                            SizedBox(
+                              height: 17.w,
+                            ),
+                            MyProjectTab(
+                              page: _page,
+                              onChangePage: onChangePage,
+                            ),
+                            SizedBox(
+                              height: 10.w,
+                            ),
+                            StreamBuilder<List<ProjectModel>>(
+                              stream: context
+                                  .read<ProjectCubit>()
+                                  .getProjectFromFirestore(user_uid),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  final List<ProjectModel> projectList =
+                                      snapshot.data!;
+                                  if (projectList.isNotEmpty) {
+                                    return _page == 0
+                                        ? MyAllProjects(projects: projectList)
+                                        : MyCompletedProjects(
+                                            projects: projectList);
+                                  } else {
+                                    return const Center(
+                                        child: CircularProgressIndicator());
+                                  }
+                                } else if (snapshot.hasError) {
+                                  return Text('Error: ${snapshot.error}');
+                                } else {
+                                  return CircularProgressIndicator();
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                  padding: EdgeInsets.only(top: 20.h),
-                  child: Column(
-                    children: [
-                      const InputBox(label: "Search"),
-                      SizedBox(
-                        height: 17.w,
-                      ),
-                      MyProjectTab(
-                        page: _page,
-                        onChangePage: onChangePage,
-                      ),
-                      SizedBox(
-                        height: 10.w,
-                      ),
-                      StreamBuilder<List<ProjectModel>>(
-                        stream: context
-                            .read<ProjectCubit>()
-                            .getProjectFromFirestore(user_uid),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            final List<ProjectModel> projectList =
-                                snapshot.data!;
-                            if (projectList.isNotEmpty) {
-                              return _page == 0
-                                  ? MyAllProjects(projects: projectList)
-                                  : MyCompletedProjects(projects: projectList);
-                            } else {
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            }
-                          } else if (snapshot.hasError) {
-                            return Text('Error: ${snapshot.error}');
-                          } else {
-                            return CircularProgressIndicator();
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
+                ],
               ),
             ),
           ),
