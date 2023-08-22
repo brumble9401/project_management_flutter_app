@@ -27,7 +27,7 @@ class _MyChatPageState extends State<MyChatPage> {
   final _auth = FirebaseAuth.instance;
   String roomUid = "";
 
-  void createRoom(String userId1, String userId2) async {
+  Future<void> createRoom(String userId1, String userId2) async {
     roomUid = await context.read<ChatCubit>().createChatRoom(userId1, userId2);
   }
 
@@ -160,7 +160,7 @@ class _MyChatPageState extends State<MyChatPage> {
                       child: OutlinedButton(
                         onPressed: () async {
                           if (roomId == "") {
-                            createRoom(
+                            await createRoom(
                                 users[index].id!, _auth.currentUser!.uid);
                             if (roomUid != "") {
                               Navigator.pushNamed(context, RouteName.chat_room,
@@ -186,8 +186,11 @@ class _MyChatPageState extends State<MyChatPage> {
                             ),
                           ),
                         ),
-                        child: const CircleAvatar(
-                          backgroundImage: AssetImage('assets/images/dog.jpg'),
+                        child: CircleAvatar(
+                          backgroundImage: users[index].avatar != ''
+                              ? NetworkImage(users[index].avatar.toString())
+                              : const NetworkImage(
+                                  'https://img.myloview.com/posters/default-avatar-profile-icon-vector-social-media-user-photo-400-205577532.jpg'),
                         ),
                       ),
                     ),

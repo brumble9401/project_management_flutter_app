@@ -51,12 +51,21 @@ class _MyChatCardState extends State<MyChatCard> {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  CircleAvatar(
-                    radius: 30.w,
-                    backgroundImage: AssetImage("assets/images/dog.png"),
-                    backgroundColor: Colors.transparent,
-                  ),
                   Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: neutral_grey),
+                    ),
+                    child: CircleAvatar(
+                      radius: 30.w,
+                      backgroundImage: snapshot.data!.avatar == ''
+                          ? const NetworkImage(
+                              'https://img.myloview.com/posters/default-avatar-profile-icon-vector-social-media-user-photo-400-205577532.jpg')
+                          : NetworkImage(snapshot.data!.avatar!),
+                      backgroundColor: Colors.transparent,
+                    ),
+                  ),
+                  SizedBox(
                     width: 180.w,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,27 +74,21 @@ class _MyChatCardState extends State<MyChatCard> {
                         SizedBox(
                           height: 3.w,
                         ),
-                        Container(
-                          child: Text(
-                            snapshot.data!.lastName! +
-                                ' ' +
-                                snapshot.data!.firstName!,
-                            style: TextStyle(
-                              fontSize: 15.w,
-                              fontWeight: FontWeight.bold,
-                              overflow: TextOverflow.ellipsis,
-                              color: neutral_dark,
-                            ),
+                        Text(
+                          '${snapshot.data!.lastName!} ${snapshot.data!.firstName!}',
+                          style: TextStyle(
+                            fontSize: 15.w,
+                            fontWeight: FontWeight.bold,
+                            overflow: TextOverflow.ellipsis,
+                            color: neutral_dark,
                           ),
                         ),
-                        Container(
-                          child: Text(
-                            "asdasdasd",
-                            style: TextStyle(
-                              fontSize: 13.sp,
-                              overflow: TextOverflow.ellipsis,
-                              color: neutral_dark,
-                            ),
+                        Text(
+                          widget.chatRoom.lastMess.toString(),
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            overflow: TextOverflow.ellipsis,
+                            color: neutral_dark,
                           ),
                         ),
                         SizedBox(
@@ -109,14 +112,12 @@ class _MyChatCardState extends State<MyChatCard> {
                           color: primary,
                         ),
                       ),
-                      Container(
-                        child: Text(
-                          "10 mins",
-                          style: TextStyle(
-                            fontSize: 10.w,
-                            color: neutral_grey,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                      Text(
+                        "10 mins",
+                        style: TextStyle(
+                          fontSize: 10.w,
+                          color: neutral_grey,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       SizedBox(

@@ -25,10 +25,39 @@ class _ProfilePageState extends State<ProfilePage> {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      await context
-          .read<UploadCubit>()
-          .uploadAvatar(File(pickedFile.path), pickedFile.name, userUid);
+      try {
+        if (context.mounted) {
+          await context
+              .read<UploadCubit>()
+              .uploadAvatar(File(pickedFile.path), pickedFile.name, userUid);
+        }
+        _showUploadAlert(true); // Show success alert
+      } catch (error) {
+        _showUploadAlert(false); // Show error alert
+      }
     }
+  }
+
+  void _showUploadAlert(bool success) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(success ? "Upload Successful" : "Upload Failed"),
+          content: Text(success
+              ? "Image uploaded successfully!"
+              : "Image upload failed."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -92,9 +121,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                 Padding(
                                   padding: EdgeInsets.only(bottom: 10.h),
                                   child: Container(
+                                    // width: 160.sp,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      border: Border.all(color: white),
+                                      border: Border.all(color: neutral_dark),
                                       boxShadow: const [
                                         BoxShadow(
                                           color: neutral_lightgrey,
@@ -122,8 +152,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                       _pickImage();
                                     },
                                     icon: const Icon(
-                                      FontAwesomeIcons.penToSquare,
-                                      color: neutral_dark,
+                                      FontAwesomeIcons.camera,
+                                      color: neutral_lightgrey,
                                     ),
                                   ),
                                 ),

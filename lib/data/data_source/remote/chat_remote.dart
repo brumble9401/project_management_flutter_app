@@ -34,6 +34,7 @@ class ChatRemoteSource extends ChatRemote {
         final chatRoomData = chatRoomDoc.data();
         final id = chatRoomDoc.id;
         final users = List<String>.from(chatRoomData['users']);
+        final lastMess = chatRoomData['last_mess'];
 
         // Fetch messages for the current chat room
         final messagesSnapshot = await chatRoomDoc.reference
@@ -55,6 +56,7 @@ class ChatRemoteSource extends ChatRemote {
           id: id,
           users: users,
           messages: messages,
+          lastMess: lastMess,
         );
       }));
 
@@ -161,7 +163,8 @@ class ChatRemoteSource extends ChatRemote {
           FirebaseFirestore.instance.collection('chatRooms');
       final DocumentReference<Map<String, dynamic>> newRoomRef =
           await chatRoomRef.add({
-        'users': [userId1, userId2]
+        'users': [userId1, userId2],
+        'last_mess': '',
       });
       print('New project created successfully}!');
       return newRoomRef.id;
@@ -205,6 +208,10 @@ class ChatRemoteSource extends ChatRemote {
       'created_date': Timestamp.now(),
       'read_by': [],
     };
+
+    _firestore.collection('chatRooms').doc(chatRoomId).update({
+      'last_mess': text,
+    });
     return messageRef.add(message);
   }
 }

@@ -18,10 +18,12 @@ class ChatRoom {
   final String? id;
   final List<String>? users;
   final List<MessageModel>? messages;
+  final String? lastMess;
 
   ChatRoom({
     this.id,
     this.users,
     this.messages,
+    this.lastMess,
   });
 }
