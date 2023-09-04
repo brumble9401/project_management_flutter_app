@@ -41,4 +41,9 @@ class ChatRepository {
       String chatRoomId, String sender, String text) async {
     await _chatRemoteSource.sendMessage(chatRoomId, sender, text);
   }
+
+  Future<void> updateReadStatus(
+      String userId, String roomId, String messageId) async {
+    await _chatRemoteSource.updateReadStatus(userId, roomId, messageId);
+  }
 }

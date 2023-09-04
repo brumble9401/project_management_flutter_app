@@ -85,4 +85,13 @@ class ChatCubit extends Cubit<ChatState> {
       LogUtil.error("Send message failed", error: e);
     }
   }
+
+  Future<void> updateReadStatus(
+      String userId, String roomId, String messageId) async {
+    try {
+      await _chatRepository.updateReadStatus(userId, roomId, messageId);
+    } catch (e) {
+      LogUtil.error("Update message read failed", error: e);
+    }
+  }
 }

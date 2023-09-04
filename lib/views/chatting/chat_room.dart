@@ -125,15 +125,21 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                 List<MessageModel> messages = snap.data!;
                                 messages.sort((a, b) =>
                                     a.createdDate.compareTo(b.createdDate));
+
+                                int lastIndexReadByFriend =
+                                    messages.lastIndexWhere((message) =>
+                                        message.readBy.contains(friendUid));
+
                                 return ListView.builder(
                                   itemCount: messages.length,
                                   itemBuilder: (context, index) {
+                                    bool isLastMessageRead =
+                                        index == lastIndexReadByFriend;
                                     return buildMessageTile(
-                                      messages[index].content,
-                                      messages[index].senderId == userUid
-                                          ? true
-                                          : false,
-                                      messages[index].createdDate,
+                                      messages[index].senderId == userUid,
+                                      messages[index],
+                                      isLastMessageRead,
+                                      friendUid,
                                     );
                                   },
                                 );
@@ -188,9 +194,22 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     );
   }
 
-  Widget buildMessageTile(String content, bool isMe, DateTime time) {
+  Widget buildMessageTile(
+    bool isMe,
+    MessageModel message,
+    bool isLastMessageRead,
+    String friendUid,
+  ) {
+    if (message.readBy.isEmpty) {
+      if (userUid != message.senderId) {
+        context
+            .read<ChatCubit>()
+            .updateReadStatus(userUid, widget.chatRoomUid, message.id);
+      }
+    }
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: EdgeInsets.symmetric(vertical: 4.h, horizontal: 7.w),
       child: Align(
         alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
         child: isMe
@@ -198,36 +217,65 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  // else if (message.readBy.isEmpty)
                   Text(
-                    DateFormat('h:mm a').format(time),
-                    style: TextStyle(color: neutral_grey),
+                    DateFormat('h:mm a').format(message.createdDate),
+                    style: const TextStyle(color: neutral_grey),
                   ),
                   SizedBox(
                     width: 15.w,
                   ),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: isMe ? primary : neutral_lightgrey,
-                      borderRadius: isMe
-                          ? BorderRadius.only(
-                              topLeft: Radius.circular(13.sp),
-                              topRight: Radius.circular(13.sp),
-                              bottomLeft: Radius.circular(13.sp),
-                            )
-                          : BorderRadius.only(
-                              topLeft: Radius.circular(13.sp),
-                              topRight: Radius.circular(13.sp),
-                              bottomRight: Radius.circular(13.sp),
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: isMe ? primary : neutral_lightgrey,
+                            borderRadius: isMe
+                                ? BorderRadius.only(
+                                    topLeft: Radius.circular(13.sp),
+                                    topRight: Radius.circular(13.sp),
+                                    bottomLeft: Radius.circular(13.sp),
+                                  )
+                                : BorderRadius.only(
+                                    topLeft: Radius.circular(13.sp),
+                                    topRight: Radius.circular(13.sp),
+                                    bottomRight: Radius.circular(13.sp),
+                                  ),
+                          ),
+                          padding: const EdgeInsets.all(12.0),
+                          child: Container(
+                            child: Text(
+                              message.content,
+                              style: TextStyle(
+                                color: isMe ? Colors.white : Colors.black,
+                              ),
                             ),
-                    ),
-                    padding: const EdgeInsets.all(12.0),
-                    child: Container(
-                      child: Text(
-                        content,
-                        style: TextStyle(
-                          color: isMe ? Colors.white : Colors.black,
+                          ),
                         ),
-                      ),
+                        if (isLastMessageRead)
+                          Padding(
+                            padding: EdgeInsets.only(top: 2.h),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  "read",
+                                  style: TextStyle(
+                                    fontSize: 11.sp,
+                                    color: neutral_grey,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 2.w,
+                                ),
+                                Icon(Icons.done_all_rounded,
+                                    color: primary, size: 14.sp),
+                              ],
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 ],
@@ -236,39 +284,67 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Flexible(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: isMe ? primary : neutral_lightgrey,
-                        borderRadius: isMe
-                            ? BorderRadius.only(
-                                topLeft: Radius.circular(13.sp),
-                                topRight: Radius.circular(13.sp),
-                                bottomLeft: Radius.circular(13.sp),
-                              )
-                            : BorderRadius.only(
-                                topLeft: Radius.circular(13.sp),
-                                topRight: Radius.circular(13.sp),
-                                bottomRight: Radius.circular(13.sp),
-                              ),
-                      ),
-                      padding: const EdgeInsets.all(12.0),
-                      child: Container(
-                        child: Text(
-                          content,
-                          style: TextStyle(
-                            color: isMe ? Colors.white : Colors.black,
-                            // overflow: TextOverflow.fade,
-                          ),
-                        ),
-                      ),
-                    ),
+                    fit: FlexFit.tight,
+                    child: StreamBuilder<UserModel>(
+                        stream:
+                            context.read<UserCubit>().getUserFromUid(friendUid),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                CircleAvatar(
+                                  radius: 15.sp,
+                                  backgroundImage: snapshot.data!.avatar == ''
+                                      ? const NetworkImage(
+                                          'https://img.myloview.com/posters/default-avatar-profile-icon-vector-social-media-user-photo-400-205577532.jpg')
+                                      : NetworkImage(snapshot.data!.avatar!),
+                                ),
+                                SizedBox(
+                                  width: 5.w,
+                                ),
+                                Flexible(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: isMe ? primary : neutral_lightgrey,
+                                      borderRadius: isMe
+                                          ? BorderRadius.only(
+                                              topLeft: Radius.circular(13.sp),
+                                              topRight: Radius.circular(13.sp),
+                                              bottomLeft:
+                                                  Radius.circular(13.sp),
+                                            )
+                                          : BorderRadius.only(
+                                              topLeft: Radius.circular(13.sp),
+                                              topRight: Radius.circular(13.sp),
+                                              bottomRight:
+                                                  Radius.circular(13.sp),
+                                            ),
+                                    ),
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Text(
+                                      message.content,
+                                      style: TextStyle(
+                                        color:
+                                            isMe ? Colors.white : Colors.black,
+                                        // overflow: TextOverflow.fade,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          } else {
+                            return const CircularProgressIndicator();
+                          }
+                        }),
                   ),
                   SizedBox(
                     width: 15.w,
                   ),
                   Text(
-                    DateFormat('h:mm a').format(time),
-                    style: TextStyle(color: neutral_grey),
+                    DateFormat('h:mm a').format(message.createdDate),
+                    style: const TextStyle(color: neutral_grey),
                   ),
                 ],
               ),

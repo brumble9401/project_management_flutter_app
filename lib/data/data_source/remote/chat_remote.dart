@@ -10,6 +10,7 @@ abstract class ChatRemote {
   Future<String> createChatRoom(String userId1, String userId2);
   Stream<List<MessageModel>> getMessages(String chatRoomId);
   Future<void> sendMessage(String chatRoomId, String sender, String text);
+  Future<void> updateReadStatus(String userId, String roomId, String messageId);
 }
 
 class ChatRemoteSource extends ChatRemote {
@@ -213,5 +214,18 @@ class ChatRemoteSource extends ChatRemote {
       'last_mess': text,
     });
     return messageRef.add(message);
+  }
+
+  @override
+  Future<void> updateReadStatus(
+      String userId, String roomId, String messageId) async {
+    await _firestore
+        .collection('chatRooms')
+        .doc(roomId)
+        .collection('messages')
+        .doc(messageId)
+        .update({
+      'read_by': [userId]
+    });
   }
 }
