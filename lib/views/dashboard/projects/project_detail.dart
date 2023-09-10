@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -17,16 +18,17 @@ import 'package:pma_dclv/views/widgets/bottomModalSheet/bottom_modal_sheet.dart'
 import 'package:pma_dclv/views/widgets/card/comment_card.dart';
 import 'package:pma_dclv/views/widgets/comment_box.dart';
 
-import '../../../data/models/comment/comment_model.dart';
-import '../../../data/models/task/task_model.dart';
-import '../../../view-model/comment/comment_cubit.dart';
-import '../../../view-model/files_upload/file_cubit.dart';
-import '../../../view-model/tasks/task_cubit.dart';
-import '../../widgets/appbar/non_title_appbar.dart';
-import '../../widgets/card/file_card.dart';
-import '../../widgets/card/images_add_card.dart';
-import '../../widgets/card/task/task_add_card.dart';
-import '../../widgets/card/task/task_card_2.dart';
+import 'package:pma_dclv/data/models/comment/comment_model.dart';
+import 'package:pma_dclv/data/models/task/task_model.dart';
+import 'package:pma_dclv/view-model/comment/comment_cubit.dart';
+import 'package:pma_dclv/view-model/files_upload/file_cubit.dart';
+import 'package:pma_dclv/view-model/tasks/task_cubit.dart';
+import 'package:pma_dclv/views/widgets/appbar/non_title_appbar.dart';
+import 'package:pma_dclv/views/widgets/card/file_card.dart';
+import 'package:pma_dclv/views/widgets/card/images_add_card.dart';
+import 'package:pma_dclv/views/widgets/card/task/task_add_card.dart';
+import 'package:pma_dclv/views/widgets/card/task/task_card_2.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
 
 class MyProjectDetail extends StatefulWidget {
   const MyProjectDetail({super.key, required this.project_id});
@@ -39,6 +41,8 @@ class MyProjectDetail extends StatefulWidget {
 
 class _MyProjectDetailState extends State<MyProjectDetail> {
   final TextEditingController _commentController = TextEditingController();
+  late quill.QuillController _quillController;
+
   ProjectModel project = ProjectModel();
   String user_uid = FirebaseAuth.instance.currentUser!.uid;
   List<String> userUids = [];
@@ -89,6 +93,13 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
         if (snapshot.hasData) {
           project = snapshot.data!;
           userUids = project.userIds!;
+
+          List<dynamic> initialContentMap = jsonDecode(project.description.toString());
+          _quillController = quill.QuillController(
+            document: quill.Document.fromJson(initialContentMap),
+            selection: const TextSelection.collapsed(offset: 0),
+          );
+
           return Container(
             decoration: const BoxDecoration(
               color: white,
@@ -204,7 +215,7 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
                                     ),
                                     _buildDeadline(project.deadline),
                                     _buildMember(userUids),
-                                    _buildDescription(),
+                                    _buildDescription(_quillController.document.toPlainText().toString()),
                                     _buildImages(),
                                     SizedBox(
                                       height: 20.h,
@@ -303,7 +314,7 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
     );
   }
 
-  Widget _buildDescription() {
+  Widget _buildDescription(String description) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -330,7 +341,10 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
               ),
               GestureDetector(
                 onTap: () {
-                  print("Edit description");
+                  Navigator.pushNamed(context, RouteName.textEditing, arguments: {
+                    'controller': _quillController,
+                    'projectUid': widget.project_id,
+                  });
                 },
                 child: const Icon(
                   Icons.edit_outlined,
@@ -346,7 +360,7 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
             color: white,
           ),
           child: Text(
-            project.description.toString(),
+            description,
             style: TextStyle(
               color: neutral_grey,
               fontSize: 12.sp,
@@ -840,6 +854,7 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
   @override
   void dispose() {
     _commentController.dispose();
+    _quillController.dispose();
     super.dispose();
   }
 }

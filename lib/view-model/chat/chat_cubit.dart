@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pma_dclv/data/models/user/user_model.dart';
 import 'package:pma_dclv/data/repositories/chat_repository.dart';
 import 'package:pma_dclv/utils/log_util.dart';
 
@@ -75,10 +76,10 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   Future<void> sendMessage(
-      String chatRoomId, String sender, String text) async {
+      String chatRoomId, String sender, String text, UserModel user, String type) async {
     try {
       emit(state.copyWith(chatStatus: ChatStatus.loading));
-      await _chatRepository.sendMessage(chatRoomId, sender, text);
+      await _chatRepository.sendMessage(chatRoomId, sender, text, user, type);
       emit(state.copyWith(chatStatus: ChatStatus.success));
     } catch (e) {
       emit(state.copyWith(chatStatus: ChatStatus.fail));

@@ -13,4 +13,6 @@ class RouteName {
   static const members = "/members";
 
   static const profile = "/profile";
+
+  static const textEditing = 'text_editing';
 }

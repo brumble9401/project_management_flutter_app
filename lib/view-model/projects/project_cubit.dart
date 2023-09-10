@@ -1,5 +1,9 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:pma_dclv/data/repositories/project_repository.dart';
 import 'package:pma_dclv/utils/log_util.dart';
 
@@ -66,6 +70,17 @@ class ProjectCubit extends Cubit<ProjectState> {
       print('User added successfully');
     } catch (e) {
       print('Error adding user: $e');
+    }
+  }
+
+  Future<void> updateDescription(QuillController controller, String projectUid) async {
+    try {
+      await FirebaseFirestore.instance.collection('projects').doc(projectUid).update({
+        'description': jsonEncode(controller.document.toDelta().toJson()),
+      });
+      print('Text updated successfully.');
+    } catch (e) {
+      print('Error updating text: $e');
     }
   }
 }

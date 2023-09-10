@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -14,10 +16,11 @@ import 'package:pma_dclv/view-model/user/user_cubit.dart';
 import 'package:pma_dclv/view-model/workspace/workspace_cubit.dart';
 import 'package:pma_dclv/views/routes/route_name.dart';
 import 'package:pma_dclv/views/widgets/button/button.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
 
-import '../../../theme/theme.dart';
-import '../button/iconButton.dart';
-import '../inputBox.dart';
+import 'package:pma_dclv/theme/theme.dart';
+import 'package:pma_dclv/views/widgets/button/iconButton.dart';
+import 'package:pma_dclv/views/widgets/inputBox.dart';
 
 class MyProjectBottomModalSheet extends StatefulWidget {
   const MyProjectBottomModalSheet({
@@ -36,7 +39,8 @@ class MyProjectBottomModalSheet extends StatefulWidget {
 
 class _MyProjectBottomModalSheetState extends State<MyProjectBottomModalSheet> {
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
+  final quill.QuillController _descriptionController = quill.QuillController.basic();
+  
   DateTime deadline = DateTime.now();
   List<UserModel> users = [];
   List<int> usersId = [];
@@ -44,6 +48,11 @@ class _MyProjectBottomModalSheetState extends State<MyProjectBottomModalSheet> {
   BaseResponse<ProjectModel> project = BaseResponse<ProjectModel>();
   String projectUid = "";
 
+  @override
+  void initState() {
+    super.initState();
+  }
+  
   @override
   void dispose() {
     _nameController.dispose();
@@ -54,7 +63,7 @@ class _MyProjectBottomModalSheetState extends State<MyProjectBottomModalSheet> {
   void createProject() async {
     Map<String, dynamic> project = ({
       "project_name": _nameController.text,
-      "description": _descriptionController.text,
+      "description": jsonEncode(_descriptionController.document.toDelta().toJson()),
       "deadline": Timestamp.fromDate(deadline),
       "users_id": [user_uid],
       "created_date": Timestamp.fromDate(DateTime.now()),
@@ -264,13 +273,22 @@ class _MyProjectBottomModalSheetState extends State<MyProjectBottomModalSheet> {
                           ),
                         ),
                         SizedBox(
-                          height: 10.h,
+                          height: 15.h,
                         ),
-                        InputBox(
-                          controller: _descriptionController,
-                        ),
-                        SizedBox(
-                          height: 20.h,
+                        _descriptionController.getPlainText().isEmpty ? IconBtn(
+                          onPressed: () {
+                            Navigator.pushNamed(context, RouteName.textEditing, arguments: _descriptionController);
+                          },
+                          icon: Icon(
+                            FontAwesomeIcons.add,
+                            color: white,
+                            size: 14.sp,
+                          ),
+                        ) : Text(
+                          _descriptionController.getPlainText(),
+                          style: const TextStyle(
+                            color: neutral_dark,
+                          ),
                         ),
                       ],
                     ),

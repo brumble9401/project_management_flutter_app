@@ -21,6 +21,8 @@ import 'package:pma_dclv/views/authentication/signin.dart';
 import 'package:pma_dclv/views/authentication/signup.dart';
 import 'package:pma_dclv/views/setting/profile.dart';
 import 'package:pma_dclv/views/widget_tree.dart';
+import 'package:pma_dclv/views/widgets/text_editing/text_editing_page.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
 
 import '../../view-model/authentication/auth_cubit.dart';
 
@@ -189,6 +191,17 @@ class RouteGenerator {
           child: const ProfilePage(),
         );
         break;
+
+      case RouteName.textEditing:
+        final arguments = settings.arguments as Map<String, dynamic>;
+        final quill.QuillController controller = arguments['controller'] as quill.QuillController;
+        final projectUid = arguments['projectUid'] as String;
+        page = BlocProvider(
+          create: (context) => ProjectCubit(),
+          child: TextEditingPage(controller: controller, projectUid: projectUid,),
+        );
+        break;
+
     }
 
     return _getPageRoute(page, settings);

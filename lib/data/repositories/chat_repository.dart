@@ -1,4 +1,5 @@
 import 'package:pma_dclv/data/data_source/remote/chat_remote.dart';
+import 'package:pma_dclv/data/models/user/user_model.dart';
 
 import '../models/chat/chat_room.dart';
 
@@ -38,8 +39,8 @@ class ChatRepository {
   }
 
   Future<void> sendMessage(
-      String chatRoomId, String sender, String text) async {
-    await _chatRemoteSource.sendMessage(chatRoomId, sender, text);
+      String chatRoomId, String sender, String text, UserModel user, String type) async {
+    await _chatRemoteSource.sendMessage(chatRoomId, sender, text, user, type);
   }
 
   Future<void> updateReadStatus(

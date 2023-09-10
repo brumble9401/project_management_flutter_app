@@ -65,6 +65,7 @@ class _MyAddUserPageState extends State<MyAddUserPage> {
                 ],
               ),
             ),
+            resizeToAvoidBottomInset: false,
             body: Container(
               decoration: const BoxDecoration(
                 color: white,

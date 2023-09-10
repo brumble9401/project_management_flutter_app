@@ -8,6 +8,7 @@ import 'package:pma_dclv/views/dashboard/projects/all_projects.dart';
 import 'package:pma_dclv/views/dashboard/projects/completed_project.dart';
 import 'package:pma_dclv/views/dashboard/projects/project_tab.dart';
 import 'package:pma_dclv/views/widgets/appbar/center_title_appbar.dart';
+import 'package:pma_dclv/views/widgets/card/project/no_project_card.dart';
 
 import '../../../theme/theme.dart';
 import '../../widgets/inputBox.dart';
@@ -86,13 +87,12 @@ class _MyProjectViewState extends State<MyProjectView> {
                                         : MyCompletedProjects(
                                             projects: projectList);
                                   } else {
-                                    return const Center(
-                                        child: CircularProgressIndicator());
+                                    return const NoProjectCard();
                                   }
                                 } else if (snapshot.hasError) {
                                   return Text('Error: ${snapshot.error}');
                                 } else {
-                                  return CircularProgressIndicator();
+                                  return Container();
                                 }
                               },
                             ),

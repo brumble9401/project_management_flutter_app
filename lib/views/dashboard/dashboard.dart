@@ -48,6 +48,7 @@ class _MyDashBoardState extends State<MyDashBoard> {
   void initState() {
     super.initState();
     _loadSelectedWorkspaceUid();
+    context.read<UserCubit>().updatePushToken(_auth.currentUser!.uid);
   }
 
   @override
@@ -69,15 +70,6 @@ class _MyDashBoardState extends State<MyDashBoard> {
                 ),
                 context: context,
                 builder: (BuildContext context) => MultiBlocProvider(
-                  providers: [
-                    BlocProvider(
-                      create: (context) => ProjectCubit(),
-                    ),
-                    BlocProvider(
-                      create: (context) => UserCubit(),
-                    ),
-                  ],
-                  child: MultiBlocProvider(
                     providers: [
                       BlocProvider(
                         create: (context) => WorkspaceCubit(),
@@ -93,7 +85,6 @@ class _MyDashBoardState extends State<MyDashBoard> {
                       title: "Create Project",
                       workspaceUid: workspaceUid.toString(),
                     ),
-                  ),
                 ),
               ),
             ),

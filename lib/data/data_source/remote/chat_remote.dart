@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pma_dclv/data/models/chat/chat_room.dart';
+import 'package:pma_dclv/data/models/user/user_model.dart';
+import 'package:pma_dclv/utils/Notification_Services.dart';
 
 abstract class ChatRemote {
   Stream<List<ChatRoom>> getChatRooms(String userId);
@@ -9,7 +11,7 @@ abstract class ChatRemote {
   Stream<ChatRoom> getRoomFromRoomUid(String roomUid);
   Future<String> createChatRoom(String userId1, String userId2);
   Stream<List<MessageModel>> getMessages(String chatRoomId);
-  Future<void> sendMessage(String chatRoomId, String sender, String text);
+  Future<void> sendMessage(String chatRoomId, String sender, String text, UserModel user, String type);
   Future<void> updateReadStatus(String userId, String roomId, String messageId);
 }
 
@@ -50,6 +52,7 @@ class ChatRemoteSource extends ChatRemote {
             senderId: messageData['user_id'],
             createdDate: messageData['created_date'].toDate(),
             readBy: List<String>.from(messageData['read_by']),
+            type: messageData['type'],
           );
         }).toList();
 
@@ -101,6 +104,7 @@ class ChatRemoteSource extends ChatRemote {
             senderId: messageData['user_id'],
             createdDate: messageData['created_date'].toDate(),
             readBy: List<String>.from(messageData['read_by']),
+            type: messageData['type'],
           );
         }).toList();
 
@@ -143,6 +147,7 @@ class ChatRemoteSource extends ChatRemote {
             senderId: messageData['user_id'],
             createdDate: messageData['created_date'].toDate(),
             readBy: List<String>.from(messageData['read_by']),
+            type: messageData['type'],
           );
         }).toList();
 
@@ -192,13 +197,14 @@ class ChatRemoteSource extends ChatRemote {
           senderId: data['user_id'],
           createdDate: createdDate,
           readBy: List<String>.from(data['read_by']),
+          type: data['type'],
         );
       }).toList();
     });
   }
 
   @override
-  Future<void> sendMessage(String chatRoomId, String sender, String text) {
+  Future<void> sendMessage(String chatRoomId, String sender, String text, UserModel user, String type) {
     final messageRef = _firestore
         .collection('chatRooms')
         .doc(chatRoomId)
@@ -208,12 +214,20 @@ class ChatRemoteSource extends ChatRemote {
       'content': text,
       'created_date': Timestamp.now(),
       'read_by': [],
+      'type': type,
     };
 
-    _firestore.collection('chatRooms').doc(chatRoomId).update({
-      'last_mess': text,
-    });
-    return messageRef.add(message);
+    if(type == 'text') {
+      _firestore.collection('chatRooms').doc(chatRoomId).update({
+        'last_mess': text,
+      });
+    } else if(type == 'image'){
+      _firestore.collection('chatRooms').doc(chatRoomId).update({
+        'last_mess': '[Image]',
+      });
+    }
+
+    return messageRef.add(message).then((value) => NotificationServices().sendPushNotification(user, text));
   }
 
   @override

@@ -1,4 +1,5 @@
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -22,6 +23,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
+  final _auth = FirebaseAuth.instance;
 
   final List<Widget> _page = [
     MultiBlocProvider(
@@ -34,6 +36,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         BlocProvider(
           create: (context) => WorkspaceCubit(),
+        ),
+        BlocProvider(
+          create: (context) => UserCubit(),
         ),
       ],
       child: const MyDashBoard(),
@@ -63,10 +68,15 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _page[_currentIndex],
-      bottomNavigationBar: SizedBox(
-        height: 80.h,
+      bottomNavigationBar: Container(
+        height: 60.h,
+        padding: EdgeInsets.only(bottom: 10.h),
+        decoration: BoxDecoration(
+          color: white,
+        ),
         child: CustomNavigationBar(
           isFloating: true,
+          backgroundColor: Colors.white,
           borderRadius: Radius.circular(20.w),
           strokeColor: primary,
           currentIndex: _currentIndex,

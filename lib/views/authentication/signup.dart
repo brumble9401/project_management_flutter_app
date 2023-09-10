@@ -30,10 +30,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
   RegisterModel userRegis = RegisterModel();
 
-  void _onPressed() {
-    print("asdasd");
-  }
-
   void register() async {
     Map<String, dynamic> obj = {
       "first_name": _firstNameController.text,
@@ -60,6 +56,7 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.only(

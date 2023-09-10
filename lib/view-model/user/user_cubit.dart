@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pma_dclv/data/repositories/user_repository.dart';
+import 'package:pma_dclv/utils/Notification_Services.dart';
+import 'package:pma_dclv/utils/user_adapter.dart';
 
 import '../../data/models/user/user_model.dart';
 import '../../utils/log_util.dart';
@@ -46,6 +49,19 @@ class UserCubit extends Cubit<UserState> {
     } catch (e) {
       print(e);
       yield users;
+    }
+  }
+
+  Future<void> updatePushToken(String userUid) async {
+    try {
+      final String token = await NotificationServices().getToken();
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userUid)
+          .update({'pushToken': token});
+      print('Token updated successfully.');
+    } catch (e) {
+      print('Error Token updated : $e');
     }
   }
 }

@@ -5,14 +5,19 @@ class UserModel {
   String? email;
   String? avatar;
   List<String>? workspaceIds;
+  String? pushToken;
 
   UserModel(
-      {this.id,
-      this.firstName,
-      this.lastName,
-      this.email,
-      this.avatar,
-      this.workspaceIds});
+      {
+        this.id,
+        this.firstName,
+        this.lastName,
+        this.email,
+        this.avatar,
+        this.workspaceIds,
+        this.pushToken,
+      }
+  );
 
   UserModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -20,6 +25,7 @@ class UserModel {
     lastName = json['last_name'];
     email = json['email'];
     avatar = json['avatar'];
+    pushToken = json['pushToken'];
   }
 
   Map<String, dynamic> toJson() {
@@ -29,6 +35,7 @@ class UserModel {
     data['last_name'] = this.lastName;
     data['email'] = this.email;
     data['avatar'] = this.avatar;
+    data['pushToken'] = this.pushToken;
     return data;
   }
 }

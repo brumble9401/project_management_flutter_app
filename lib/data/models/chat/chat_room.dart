@@ -4,6 +4,7 @@ class MessageModel {
   final String senderId;
   final DateTime createdDate;
   final List<String> readBy;
+  final String type;
 
   MessageModel({
     required this.id,
@@ -11,6 +12,7 @@ class MessageModel {
     required this.senderId,
     required this.createdDate,
     required this.readBy,
+    required this.type,
   });
 }
 

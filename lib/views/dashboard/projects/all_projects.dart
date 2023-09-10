@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pma_dclv/data/models/project/project_model.dart';
 import 'package:pma_dclv/views/routes/route_name.dart';
+import 'package:pma_dclv/views/widgets/card/project/no_project_card.dart';
 
 import '../../widgets/card/project_card.dart';
 
@@ -18,11 +19,14 @@ class MyAllProjects extends StatefulWidget {
 }
 
 class _MyAllProjectsState extends State<MyAllProjects> {
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+    if(widget.projects.isEmpty){
+      return const NoProjectCard();
+    } else {
+      return ListView.builder(
       controller: _scrollController,
       shrinkWrap: true,
       scrollDirection: Axis.vertical,
@@ -40,6 +44,7 @@ class _MyAllProjectsState extends State<MyAllProjects> {
         );
       },
     );
+    }
   }
 
   @override

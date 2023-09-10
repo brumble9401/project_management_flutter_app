@@ -30,6 +30,7 @@ class UserRemoteSource extends UserRemote {
             lastName: doc['last_name'] ?? '',
             email: doc['email'] ?? '',
             avatar: doc['avatar'] ?? '',
+            pushToken: doc['pushToken'] ?? '',
             workspaceIds: List<String>.from(doc['workspace_id']),
           );
         }).toList();
@@ -56,6 +57,7 @@ class UserRemoteSource extends UserRemote {
             lastName: snapshot['last_name'] ?? '',
             email: snapshot['email'] ?? '',
             avatar: snapshot['avatar'] ?? '',
+            pushToken: snapshot['pushToken'] ?? '',
             workspaceIds: List<String>.from(snapshot['workspace_id']),
           );
         } else {
