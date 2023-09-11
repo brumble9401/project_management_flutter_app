@@ -277,7 +277,7 @@ class _MyProjectBottomModalSheetState extends State<MyProjectBottomModalSheet> {
                         ),
                         _descriptionController.getPlainText().isEmpty ? IconBtn(
                           onPressed: () {
-                            Navigator.pushNamed(context, RouteName.textEditing, arguments: {'controller':_descriptionController, 'projectUid':''});
+                            Navigator.pushNamed(context, RouteName.textEditing, arguments: {'controller':_descriptionController, 'projectUid':'', 'type':''});
                           },
                           icon: Icon(
                             FontAwesomeIcons.add,

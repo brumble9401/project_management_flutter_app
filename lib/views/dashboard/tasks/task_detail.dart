@@ -1,8 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -15,13 +15,14 @@ import 'package:pma_dclv/view-model/tasks/task_cubit.dart';
 import 'package:pma_dclv/views/routes/route_name.dart';
 import 'package:pma_dclv/views/widgets/card/images_add_card.dart';
 
-import '../../../theme/theme.dart';
-import '../../../view-model/files_upload/file_cubit.dart';
-import '../../widgets/appbar/non_title_appbar.dart';
-import '../../widgets/card/comment_card.dart';
-import '../../widgets/card/file_card.dart';
-import '../../widgets/comment_box.dart';
+import 'package:pma_dclv/theme/theme.dart';
+import 'package:pma_dclv/view-model/files_upload/file_cubit.dart';
+import 'package:pma_dclv/views/widgets/appbar/non_title_appbar.dart';
+import 'package:pma_dclv/views/widgets/card/comment_card.dart';
+import 'package:pma_dclv/views/widgets/card/file_card.dart';
+import 'package:pma_dclv/views/widgets/comment_box.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
 
 class MyTaskDetail extends StatefulWidget {
   const MyTaskDetail({super.key, required this.taskId});
@@ -34,6 +35,7 @@ class MyTaskDetail extends StatefulWidget {
 
 class _MyTaskDetailState extends State<MyTaskDetail> {
   final TextEditingController _commentController = TextEditingController();
+  late quill.QuillController _quillController;
   TaskModel task = TaskModel();
   String user_uid = FirebaseAuth.instance.currentUser!.uid;
   PlatformFile? pickedImage;
@@ -85,6 +87,7 @@ class _MyTaskDetailState extends State<MyTaskDetail> {
   @override
   void dispose() {
     _commentController.dispose();
+    _quillController.dispose();
     super.dispose();
   }
 
@@ -95,6 +98,13 @@ class _MyTaskDetailState extends State<MyTaskDetail> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           task = snapshot.data!;
+
+          List<dynamic> initialContentMap = jsonDecode(task.description.toString());
+          _quillController = quill.QuillController(
+            document: quill.Document.fromJson(initialContentMap),
+            selection: const TextSelection.collapsed(offset: 0),
+          );
+
           return Container(
             decoration: const BoxDecoration(
               color: white,
@@ -224,47 +234,7 @@ class _MyTaskDetailState extends State<MyTaskDetail> {
                                     ),
                                     _buildDeadline(task.deadline),
                                     _buildMember(task.userIds as List<String>),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          top: 10.h, bottom: 10.h),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              const Icon(
-                                                  Icons.description_outlined),
-                                              SizedBox(
-                                                width: 5.w,
-                                              ),
-                                              Text(
-                                                "Description",
-                                                style: TextStyle(
-                                                  color: neutral_dark,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 14.sp,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          Icon(Icons.edit_outlined),
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: EdgeInsets.only(bottom: 20.h),
-                                      decoration: const BoxDecoration(
-                                        color: white,
-                                      ),
-                                      child: Text(
-                                        task.description.toString(),
-                                        style: TextStyle(
-                                          color: neutral_grey,
-                                          fontSize: 12.sp,
-                                        ),
-                                      ),
-                                    ),
+                                    _buildDescription(_quillController.document.toPlainText().toString()),
                                     _buildImages(),
                                     SizedBox(
                                       height: 20.h,
@@ -352,6 +322,64 @@ class _MyTaskDetailState extends State<MyTaskDetail> {
           );
         }
       },
+    );
+  }
+
+  Widget _buildDescription(String description) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.description_outlined),
+                  SizedBox(
+                    width: 5.w,
+                  ),
+                  Text(
+                    "Description",
+                    style: TextStyle(
+                      color: neutral_dark,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14.sp,
+                    ),
+                  ),
+                ],
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, RouteName.textEditing, arguments: {
+                    'controller': _quillController,
+                    'projectUid': widget.taskId,
+                    'type': 'tasks',
+                  });
+                },
+                child: const Icon(
+                  Icons.edit_outlined,
+                  color: neutral_dark,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          padding: EdgeInsets.only(bottom: 20.h),
+          decoration: const BoxDecoration(
+            color: white,
+          ),
+          child: Text(
+            description,
+            style: TextStyle(
+              color: neutral_grey,
+              fontSize: 12.sp,
+            ),
+          ),
+        ),
+      ],
     );
   }
 

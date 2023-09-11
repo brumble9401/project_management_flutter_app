@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -9,10 +11,11 @@ import 'package:pma_dclv/view-model/tasks/task_cubit.dart';
 import 'package:pma_dclv/view-model/user/user_cubit.dart';
 import 'package:pma_dclv/views/routes/route_name.dart';
 import 'package:pma_dclv/views/widgets/button/button.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
 
-import '../../../theme/theme.dart';
-import '../button/iconButton.dart';
-import '../inputBox.dart';
+import 'package:pma_dclv/theme/theme.dart';
+import 'package:pma_dclv/views/widgets/button/iconButton.dart';
+import 'package:pma_dclv/views/widgets/inputBox.dart';
 
 class MyBottomModalSheet extends StatefulWidget {
   const MyBottomModalSheet(
@@ -28,7 +31,7 @@ class MyBottomModalSheet extends StatefulWidget {
 
 class _MyBottomModalSheetState extends State<MyBottomModalSheet> {
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
+  final quill.QuillController _descriptionController = quill.QuillController.basic();
   DateTime deadline = DateTime.now();
   String user_uid = FirebaseAuth.instance.currentUser!.uid.toString();
   String task_uid = "";
@@ -45,7 +48,7 @@ class _MyBottomModalSheetState extends State<MyBottomModalSheet> {
     //     DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(deadline);
     Map<String, dynamic> task = {
       "task_name": _nameController.text,
-      "description": _descriptionController.text,
+      "description": jsonEncode(_descriptionController.document.toDelta().toJson()),
       // "deadline": DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(deadline),
       "deadline": Timestamp.fromDate(deadline),
       "users_id": [
@@ -229,12 +232,22 @@ class _MyBottomModalSheetState extends State<MyBottomModalSheet> {
                   SizedBox(
                     height: 10.h,
                   ),
-                  InputBox(
-                    controller: _descriptionController,
-                  ),
-                  SizedBox(
-                    height: 20.h,
-                  ),
+                  _descriptionController.getPlainText().isEmpty ? IconBtn(
+                    onPressed: () {
+                      Navigator.pushNamed(context, RouteName.textEditing, arguments: {'controller':_descriptionController, 'projectUid':'', 'type': ''});
+                      print("a");
+                      },
+                    icon: Icon(
+                      FontAwesomeIcons.add,
+                      color: white,
+                      size: 14.sp,
+                    ),
+                  ) : Text(
+                    _descriptionController.getPlainText(),
+                    style: const TextStyle(
+                      color: neutral_dark,
+                    ),
+                  )
                 ],
               ),
               Padding(

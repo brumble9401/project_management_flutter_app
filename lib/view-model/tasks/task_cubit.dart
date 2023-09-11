@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:pma_dclv/data/repositories/task_repository.dart';
 import 'package:pma_dclv/utils/log_util.dart';
 
@@ -101,6 +104,17 @@ class TaskCubit extends Cubit<TaskState> {
       LogUtil.info("Add users to task success");
     } catch (e) {
       LogUtil.error("Add users task error: ", error: e);
+    }
+  }
+
+  Future<void> updateDescription(QuillController controller, String taskUid) async {
+    try {
+      await FirebaseFirestore.instance.collection('tasks').doc(taskUid).update({
+        'description': jsonEncode(controller.document.toDelta().toJson()),
+      });
+      print('Text updated successfully.');
+    } catch (e) {
+      print('Error updating text: $e');
     }
   }
 }

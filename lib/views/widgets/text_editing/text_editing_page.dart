@@ -4,12 +4,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pma_dclv/theme/theme.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:pma_dclv/view-model/projects/project_cubit.dart';
+import 'package:pma_dclv/view-model/tasks/task_cubit.dart';
 
 class TextEditingPage extends StatefulWidget {
-  const TextEditingPage({super.key, required this.controller, this.projectUid});
+  const TextEditingPage({super.key, required this.controller, this.projectUid, required this.type});
 
   final quill.QuillController controller;
   final String? projectUid;
+  final String type;
 
   @override
   State<TextEditingPage> createState() => _TextEditingPageState();
@@ -43,7 +45,12 @@ class _TextEditingPageState extends State<TextEditingPage> {
             actions: [
               TextButton(
                 onPressed: (){
-                  context.read<ProjectCubit>().updateDescription(widget.controller, widget.projectUid.toString());
+                  if(widget.type == 'projects') {
+                    context.read<ProjectCubit>().updateDescription(widget.controller, widget.projectUid.toString());
+                  }
+                  else if(widget.type == 'tasks'){
+                    context.read<TaskCubit>().updateDescription(widget.controller, widget.projectUid.toString());
+                  }
                   Navigator.pop(context);
                   },
                 child: const Text('Save'),

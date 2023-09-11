@@ -370,6 +370,7 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
                   Navigator.pushNamed(context, RouteName.textEditing, arguments: {
                     'controller': _quillController,
                     'projectUid': widget.project_id,
+                    'type': 'projects',
                   });
                 },
                 child: const Icon(

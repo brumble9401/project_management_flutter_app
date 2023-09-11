@@ -208,9 +208,17 @@ class RouteGenerator {
         final arguments = settings.arguments as Map<String, dynamic>;
         final quill.QuillController controller = arguments['controller'] as quill.QuillController;
         final projectUid = arguments['projectUid'] as String;
-        page = BlocProvider(
-          create: (context) => ProjectCubit(),
-          child: TextEditingPage(controller: controller, projectUid: projectUid,),
+        final String type = arguments['type'] as String;
+        page = MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) => ProjectCubit(),
+            ),
+            BlocProvider(
+              create: (context) => TaskCubit(),
+            ),
+          ],
+          child: TextEditingPage(controller: controller, projectUid: projectUid, type: type,),
         );
         break;
 
