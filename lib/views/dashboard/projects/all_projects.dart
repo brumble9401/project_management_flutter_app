@@ -20,25 +20,28 @@ class MyAllProjects extends StatefulWidget {
 
 class _MyAllProjectsState extends State<MyAllProjects> {
   final ScrollController _scrollController = ScrollController();
+  late final List<ProjectModel> projects = widget.projects
+      .where((project) => project.state.toString() == "inprogress")
+      .toList();
 
   @override
   Widget build(BuildContext context) {
-    if(widget.projects.isEmpty){
+    if(projects.isEmpty){
       return const NoProjectCard();
     } else {
       return ListView.builder(
       controller: _scrollController,
       shrinkWrap: true,
       scrollDirection: Axis.vertical,
-      itemCount: widget.projects.length,
+      itemCount: projects.length,
       itemBuilder: (BuildContext context, int index) {
         return Padding(
           padding: EdgeInsets.symmetric(vertical: 8.h),
           child: MyProjectCard(
-            project: widget.projects[index],
+            project: projects[index],
             onPressed: () {
               Navigator.pushNamed(context, RouteName.project_detail,
-                  arguments: widget.projects[index].id.toString());
+                  arguments: projects[index].id.toString());
             },
           ),
         );

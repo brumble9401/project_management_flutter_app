@@ -5,11 +5,15 @@ import 'package:pma_dclv/data/models/user/user_model.dart';
 import 'package:pma_dclv/theme/theme.dart';
 import 'package:pma_dclv/view-model/user/user_cubit.dart';
 import 'package:pma_dclv/views/dashboard/add_users/user_card.dart';
+import 'package:pma_dclv/views/routes/route_name.dart';
 
 class MyMemberPage extends StatefulWidget {
-  const MyMemberPage({super.key, required this.uids});
+  const MyMemberPage({super.key, required this.uids, required this.projectUid, required this.workspaceUid, required this.type});
 
   final List<String> uids;
+  final String projectUid;
+  final String workspaceUid;
+  final String type;
 
   @override
   State<MyMemberPage> createState() => _MyMemberPageState();
@@ -54,8 +58,11 @@ class _MyMemberPageState extends State<MyMemberPage> {
                   ),
                   TextButton(
                     onPressed: () {
-                      // addUser();
-                      // Navigator.pop(context);
+                      Navigator.pushNamed(context, RouteName.add_user, arguments: {
+                          'uids': [widget.workspaceUid, widget.projectUid],
+                          'type': widget.type,
+                        },
+                      );
                     },
                     child: const Text("Add"),
                   )
@@ -73,7 +80,7 @@ class _MyMemberPageState extends State<MyMemberPage> {
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     List<UserModel> users = snapshot.data!;
-                    print(users);
+
                     return ListView.builder(
                       itemCount: users.length,
                       itemBuilder: (context, index) {

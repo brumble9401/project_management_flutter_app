@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,6 +12,7 @@ import 'package:pma_dclv/data/models/comment/comment_model.dart';
 import 'package:pma_dclv/data/models/task/task_model.dart';
 import 'package:pma_dclv/view-model/comment/comment_cubit.dart';
 import 'package:pma_dclv/view-model/tasks/task_cubit.dart';
+import 'package:pma_dclv/views/routes/route_name.dart';
 import 'package:pma_dclv/views/widgets/card/images_add_card.dart';
 
 import '../../../theme/theme.dart';
@@ -111,14 +113,29 @@ class _MyTaskDetailState extends State<MyTaskDetail> {
                         PopupMenuItem<String>(
                           padding: EdgeInsets.zero,
                           child: ListTile(
-                            // onTap: () {
-                            //   Navigator.pushNamed(context, RouteName.add_user,
-                            //       arguments: [project.workspaceId, task.id]);
-                            // },
+                            onTap: () {
+                              Navigator.pushNamed(context, RouteName.add_user,
+                                  arguments: {'uids':[task.workspaceId, task.id], 'type': 'tasks'});
+                            },
                             title: Text(
                               'Add user',
                               style: TextStyle(
                                 color: neutral_dark,
+                                fontSize: 14.sp,
+                              ),
+                            ),
+                          ),
+                        ),
+                        PopupMenuItem<String>(
+                          padding: EdgeInsets.zero,
+                          child: ListTile(
+                            onTap: () {
+                              context.read<TaskCubit>().updateTaskState(task.id.toString(), 'finished');
+                            },
+                            title: Text(
+                              'Mark done',
+                              style: TextStyle(
+                                color: semantic_green,
                                 fontSize: 14.sp,
                               ),
                             ),
@@ -206,6 +223,7 @@ class _MyTaskDetailState extends State<MyTaskDetail> {
                                       ),
                                     ),
                                     _buildDeadline(task.deadline),
+                                    _buildMember(task.userIds as List<String>),
                                     Padding(
                                       padding: EdgeInsets.only(
                                           top: 10.h, bottom: 10.h),
@@ -334,6 +352,61 @@ class _MyTaskDetailState extends State<MyTaskDetail> {
           );
         }
       },
+    );
+  }
+
+  Widget _buildMember(List<String> userUids) {
+    return Padding(
+      padding: EdgeInsets.only(
+        top: 5.h,
+      ),
+      child: OutlinedButton(
+        onPressed: () {
+          Navigator.pushNamed(
+            context,
+            RouteName.members,
+            arguments: {'uids':userUids, 'projectUid': task.id, 'workspaceUid': task.workspaceId, 'type': 'tasks'},
+          );
+        },
+        style: ButtonStyle(
+          side: MaterialStateProperty.all<BorderSide>(
+            const BorderSide(color: Colors.transparent),
+          ),
+          padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+            const EdgeInsets.only(left: 0.0, right: 0.0),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.person_outline,
+                  size: 20.sp,
+                  color: neutral_dark,
+                ),
+                SizedBox(
+                  width: 5.w,
+                ),
+                Text(
+                  "Members",
+                  style: TextStyle(
+                    color: neutral_dark,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            Icon(
+              Icons.chevron_right,
+              size: 20.sp,
+              color: neutral_dark,
+            ),
+          ],
+        ),
+      ),
     );
   }
 

@@ -55,10 +55,10 @@ class ProjectCubit extends Cubit<ProjectState> {
       emit(state.copyWith(projectStatus: ProjectStatus.loading));
       String uid = await _projectRepository.createProject(project);
       emit(state.copyWith(projectStatus: ProjectStatus.success));
-      LogUtil.info("Create task successfully");
+      LogUtil.info("Create project successfully");
       return uid;
     } catch (e) {
-      LogUtil.error("Create task failed", error: e);
+      LogUtil.error("Create project failed", error: e);
       return "";
     }
   }
@@ -81,6 +81,28 @@ class ProjectCubit extends Cubit<ProjectState> {
       print('Text updated successfully.');
     } catch (e) {
       print('Error updating text: $e');
+    }
+  }
+
+  Future<void> deleteProject(String projectUid) async {
+    try {
+      emit(state.copyWith(projectStatus: ProjectStatus.loading));
+      await FirebaseFirestore.instance.collection('projects').doc(projectUid).delete();
+      emit(state.copyWith(projectStatus: ProjectStatus.success));
+      LogUtil.info("Delete project successfully");
+    } catch (e) {
+      LogUtil.error("Delete project failed", error: e);
+    }
+  }
+
+  Future<void> updateProjectStatus(String projectUid, String status) async {
+    try {
+      emit(state.copyWith(projectStatus: ProjectStatus.loading));
+      await FirebaseFirestore.instance.collection('projects').doc(projectUid).update({'state': status});
+      emit(state.copyWith(projectStatus: ProjectStatus.success));
+      LogUtil.info("Update project successfully");
+    } catch (e) {
+      LogUtil.error("Update project failed", error: e);
     }
   }
 }

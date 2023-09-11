@@ -43,6 +43,7 @@ class TaskRemoteSource extends TaskRemote {
             finishedTime: (doc['finished_time'] as Timestamp).toDate(),
             state: doc['state'] ?? '',
             userIds: List<String>.from(doc['users_id']),
+            workspaceId: doc['workspace_id'] ?? '',
           );
         }).toList();
         controller.add(projects);
@@ -76,6 +77,7 @@ class TaskRemoteSource extends TaskRemote {
             finishedTime: (doc['finished_time'] as Timestamp).toDate(),
             state: doc['state'] ?? '',
             userIds: List<String>.from(doc['users_id']),
+            workspaceId: doc['workspace_id'] ?? '',
           );
         }).toList();
         controller.add(projects);
@@ -109,6 +111,7 @@ class TaskRemoteSource extends TaskRemote {
             finishedTime: (doc['finished_time'] as Timestamp).toDate(),
             state: doc['state'] ?? '',
             userIds: List<String>.from(doc['users_id']),
+            workspaceId: doc['workspace_id'] ?? '',
           );
         }).toList();
         controller.add(tasks);
@@ -144,6 +147,7 @@ class TaskRemoteSource extends TaskRemote {
             finishedTime: (doc['finished_time'] as Timestamp).toDate(),
             state: doc['state'] ?? '',
             userIds: List<String>.from(doc['users_id']),
+            workspaceId: doc['workspace_id'] ?? '',
           );
         }).toList();
         controller.add(tasks);
@@ -173,6 +177,7 @@ class TaskRemoteSource extends TaskRemote {
             finishedTime: (snapshot['finished_time'] as Timestamp).toDate(),
             state: snapshot['state'] ?? '',
             userIds: List<String>.from(snapshot['users_id']),
+            workspaceId: snapshot['workspace_id'] ?? '',
           );
         } else {
           return TaskModel();

@@ -19,8 +19,6 @@ class _MyTaskCard2State extends State<MyTaskCard2> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 150.w,
-      // height: 150.h,
       decoration: BoxDecoration(
         color: white,
         border: Border.all(color: neutral_lightgrey),
@@ -52,78 +50,115 @@ class _MyTaskCard2State extends State<MyTaskCard2> {
           ),
         ),
         child: Padding(
-          padding: EdgeInsets.all(20.w),
-          child: Column(
-            // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            // mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                // width: 120.w,
-                child: Text(
+          padding: EdgeInsets.all(12.w),
+          child: SizedBox(
+            width: 100.w,
+            child: Column(
+              // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              // mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
                   widget.task.name.toString(),
                   style: TextStyle(
-                    fontSize: 16.sp,
+                    fontSize: 18.sp,
                     overflow: TextOverflow.ellipsis,
                     fontWeight: FontWeight.bold,
                     color: neutral_dark,
                   ),
                 ),
-              ),
-              SizedBox(
-                height: 5.h,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Deadline",
-                    style: TextStyle(
-                      color: primary,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.bold,
+                SizedBox(
+                  height: 20.h,
+                ),
+                Row(
+                  children: [
+                    SizedBox(width: 20.w,),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Status",
+                              style: TextStyle(
+                                color: neutral_dark,
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 3.h,
+                            ),
+                            Text(
+                              widget.task.state == "finished" ? "Done" : "In progress",
+                              style: TextStyle(
+                                color: widget.task.state == "finished" ? semantic_green : ascent,
+                                fontSize: 12.sp,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 10.h,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Deadline",
+                              style: TextStyle(
+                                color: primary,
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 3.h,
+                            ),
+                            Text(
+                              DateFormat.yMMMd().format(
+                                  DateTime.parse(widget.task.deadline.toString())),
+                              style: TextStyle(
+                                color: neutral_grey,
+                                fontSize: 12.sp,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 10.h,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Priority",
+                              style: TextStyle(
+                                color: ascent,
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 3.h,
+                            ),
+                            Text(
+                              "High",
+                              style: TextStyle(
+                                color: neutral_grey,
+                                fontSize: 12.sp,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  ),
-                  SizedBox(
-                    height: 3.h,
-                  ),
-                  Text(
-                    DateFormat.yMMMd().format(
-                        DateTime.parse(widget.task.deadline.toString())),
-                    style: TextStyle(
-                      color: neutral_grey,
-                      fontSize: 12.sp,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 10.h,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Priority",
-                    style: TextStyle(
-                      color: ascent,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 3.h,
-                  ),
-                  Text(
-                    "High",
-                    style: TextStyle(
-                      color: neutral_grey,
-                      fontSize: 12.sp,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+
+              ],
+            ),
           ),
         ),
       ),

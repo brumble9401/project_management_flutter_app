@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pma_dclv/data/repositories/task_repository.dart';
@@ -78,6 +79,28 @@ class TaskCubit extends Cubit<TaskState> {
       LogUtil.info("Fetch tasks success");
     } catch (e) {
       LogUtil.error("Fetch tasks error: ", error: e);
+    }
+  }
+
+  Future<void> updateTaskState(String uid, String status) async {
+    try {
+      emit(state.copyWith(taskStatus: TaskStatus.loading));
+      await FirebaseFirestore.instance.collection('tasks').doc(uid).update({'state': status});
+      emit(state.copyWith(taskStatus: TaskStatus.success));
+      LogUtil.info("Update tasks success");
+    } catch (e) {
+      LogUtil.error("Update tasks error: ", error: e);
+    }
+  }
+
+  Future<void> addUser(List<String> uids, String taskUid) async {
+    try {
+      emit(state.copyWith(taskStatus: TaskStatus.loading));
+      await FirebaseFirestore.instance.collection('tasks').doc(taskUid).update({'users_id': FieldValue.arrayUnion(uids)});
+      emit(state.copyWith(taskStatus: TaskStatus.success));
+      LogUtil.info("Add users to task success");
+    } catch (e) {
+      LogUtil.error("Add users task error: ", error: e);
     }
   }
 }

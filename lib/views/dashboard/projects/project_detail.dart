@@ -90,7 +90,7 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
     return StreamBuilder<ProjectModel>(
       stream: context.read<ProjectCubit>().getProjectFromUid(widget.project_id),
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
+        if (snapshot.hasData && snapshot.data != null) {
           project = snapshot.data!;
           userUids = project.userIds!;
 
@@ -120,7 +120,7 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
                           child: ListTile(
                             onTap: () {
                               Navigator.pushNamed(context, RouteName.add_user,
-                                  arguments: [project.workspaceId, project.id]);
+                                  arguments: {'uids':[project.workspaceId, project.id], 'type': 'projects'});
                             },
                             title: Text(
                               'Add user',
@@ -131,13 +131,39 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
                             ),
                           ),
                         ),
+                        PopupMenuItem<String>(
+                          padding: EdgeInsets.zero,
+                          child: ListTile(
+                            onTap: () {
+                              context.read<ProjectCubit>().updateProjectStatus(widget.project_id, 'finished');
+                            },
+                            title: Text(
+                              'Mark done',
+                              style: TextStyle(
+                                color: neutral_dark,
+                                fontSize: 14.sp,
+                              ),
+                            ),
+                          ),
+                        ),
                         const PopupMenuDivider(),
                         PopupMenuItem<String>(
-                          child: Text(
-                            'Delete project',
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 14.sp,
+                          padding: EdgeInsets.zero,
+                          child: ListTile(
+                            onTap: () {
+                              context.read<ProjectCubit>().deleteProject(widget.project_id).then((_) {
+                                Navigator.pop(context);
+                              }).catchError((error) {
+                                // Handle any errors here, if needed
+                                print("Error deleting project: $error");
+                              });
+                            },
+                            title: Text(
+                              'Delete project',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontSize: 14.sp,
+                              ),
                             ),
                           ),
                         ),
@@ -224,7 +250,7 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
                                     SizedBox(
                                       height: 20.h,
                                     ),
-                                    _buildTasks(),
+                                    _buildTasks(project.workspaceId.toString()),
                                     SizedBox(
                                       height: 20.h,
                                     ),
@@ -378,7 +404,11 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
       ),
       child: OutlinedButton(
         onPressed: () {
-          Navigator.pushNamed(context, RouteName.members, arguments: userUids);
+          Navigator.pushNamed(
+            context,
+            RouteName.members,
+            arguments: {'uids':userUids, 'projectUid': project.id, 'workspaceUid': project.workspaceId, 'type': 'projects'},
+          );
         },
         style: ButtonStyle(
           side: MaterialStateProperty.all<BorderSide>(
@@ -698,7 +728,7 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
     );
   }
 
-  Widget _buildTasks() {
+  Widget _buildTasks(String workspaceUid) {
     return StreamBuilder<List<TaskModel>>(
         stream:
             context.read<TaskCubit>().getTaskFromProjectUid(widget.project_id),
@@ -751,6 +781,7 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
                             child: MyBottomModalSheet(
                               title: "Create Task",
                               projectId: widget.project_id.toString(),
+                              workspaceId: workspaceUid,
                             ),
                           ),
                         ),
@@ -771,7 +802,7 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
                     itemCount: tasks.length + 1,
                     itemBuilder: (context, index) {
                       if (index == tasks.length) {
-                        return MyTaskAddCard();
+                        return MyTaskAddCard(projectUid: widget.project_id, workspaceUid: workspaceUid,);
                       }
                       return Padding(
                         padding: EdgeInsets.only(right: 10.w),

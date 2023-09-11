@@ -151,8 +151,9 @@ class RouteGenerator {
         break;
 
       case RouteName.add_user:
-        // final String workspaceId = settings.arguments as String;
-        final List<String?> ids = settings.arguments as List<String?>;
+        final arguments = settings.arguments as Map<String, dynamic>;
+        final List<String?> ids = arguments['uids'] as List<String?>;
+        final String type = arguments['type'] as String;
         page = MultiBlocProvider(
           providers: [
             BlocProvider(
@@ -161,19 +162,30 @@ class RouteGenerator {
             BlocProvider(
               create: (context) => ProjectCubit(),
             ),
+            BlocProvider(
+              create: (context) => TaskCubit(),
+            ),
           ],
           child: MyAddUserPage(
             ids: ids,
+            type: type,
           ),
         );
         break;
 
       case RouteName.members:
-        final List<String> ids = settings.arguments as List<String>;
+        final arguments = settings.arguments as Map<String, dynamic>;
+        final List<String> ids = arguments['uids'] as List<String>;
+        final String projectUid = arguments['projectUid'] as String;
+        final String workspaceUid = arguments['workspaceUid'] as String;
+        final String type = arguments['type'] as String;
         page = BlocProvider(
           create: (context) => UserCubit(),
           child: MyMemberPage(
             uids: ids,
+            projectUid: projectUid,
+            workspaceUid: workspaceUid,
+            type: type,
           ),
         );
         break;

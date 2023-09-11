@@ -4,13 +4,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pma_dclv/data/models/user/user_model.dart';
 import 'package:pma_dclv/theme/theme.dart';
 import 'package:pma_dclv/view-model/projects/project_cubit.dart';
+import 'package:pma_dclv/view-model/tasks/task_cubit.dart';
 import 'package:pma_dclv/view-model/user/user_cubit.dart';
 import 'package:pma_dclv/views/dashboard/add_users/user_card.dart';
 
 class MyAddUserPage extends StatefulWidget {
-  const MyAddUserPage({super.key, required this.ids});
+  const MyAddUserPage({super.key, required this.ids, required this.type});
 
   final List<String?> ids;
+  final String type;
 
   @override
   State<MyAddUserPage> createState() => _MyAddUserPageState();
@@ -21,9 +23,13 @@ class _MyAddUserPageState extends State<MyAddUserPage> {
   List<String> selectedUsers = [];
 
   void addUser() async {
-    await context
+    if(widget.type == 'projects') {
+      await context
         .read<ProjectCubit>()
         .addUserToCollection(selectedUsers, widget.ids[1].toString());
+    } else if (widget.type == 'tasks'){
+      await context.read<TaskCubit>().addUser(selectedUsers, widget.ids[1].toString());
+    }
   }
 
   @override

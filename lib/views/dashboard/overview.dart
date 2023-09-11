@@ -88,19 +88,20 @@ class _MyOverViewState extends State<MyOverView> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 final List<TaskModel> taskList = snapshot.data!;
-                if (taskList.isNotEmpty) {
+                late final List<TaskModel> uncompletedTasks = taskList.where((task) => task.state == "inprogress").toList();
+                if (uncompletedTasks.isNotEmpty) {
                   return ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: taskList.length,
+                    itemCount: uncompletedTasks.length,
                     itemBuilder: (context, index) {
                       return Padding(
                         padding: EdgeInsets.only(bottom: 10.h),
                         child: MyTaskCard(
-                          task: taskList[index],
+                          task: uncompletedTasks[index],
                           onPressed: () {
                             Navigator.pushNamed(context, RouteName.task_detail,
-                                arguments: taskList[index].id);
+                                arguments: uncompletedTasks[index].id);
                           },
                         ),
                       );

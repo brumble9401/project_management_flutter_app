@@ -98,7 +98,7 @@ class _MySettingPageState extends State<MySettingPage> {
                           final WorkspaceModel workspace = snapshot.data![0];
                           return MyWorkspaceCard(workspace: workspace);
                         } else {
-                          return CircularProgressIndicator();
+                          return const CircularProgressIndicator();
                         }
                       },
                     ),

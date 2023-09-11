@@ -44,7 +44,8 @@ class _TextEditingPageState extends State<TextEditingPage> {
               TextButton(
                 onPressed: (){
                   context.read<ProjectCubit>().updateDescription(widget.controller, widget.projectUid.toString());
-                },
+                  Navigator.pop(context);
+                  },
                 child: const Text('Save'),
               ),
             ],

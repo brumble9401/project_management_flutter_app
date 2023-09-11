@@ -7,6 +7,7 @@ class TaskModel {
   DateTime? finishedTime;
   List<String>? userIds;
   DateTime? createdDate;
+  String? workspaceId;
 
   TaskModel(
       {this.id,
@@ -16,7 +17,9 @@ class TaskModel {
       this.state,
       this.finishedTime,
       this.userIds,
-      this.createdDate});
+      this.createdDate,
+        this.workspaceId,
+      });
 
   TaskModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -32,6 +35,7 @@ class TaskModel {
       });
     }
     createdDate = json['created_date'];
+    workspaceId = json['workspaceId'];
   }
 
   Map<String, dynamic> toJson() {

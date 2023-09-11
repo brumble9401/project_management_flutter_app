@@ -38,7 +38,11 @@ class UserBox extends StatelessWidget {
               ),
               child: CircleAvatar(
                 radius: 30.w,
-                backgroundImage: const AssetImage("assets/images/dog.jpg"),
+                backgroundImage: user.avatar != ''
+                    ? NetworkImage(user.avatar.toString())
+                    : const NetworkImage(
+                    'https://img.myloview.com/posters/default-avatar-profile-icon-vector-social-media-user-photo-400-205577532.jpg'
+                ),
                 backgroundColor: Colors.transparent,
               ),
             ),

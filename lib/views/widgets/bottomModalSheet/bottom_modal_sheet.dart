@@ -16,10 +16,11 @@ import '../inputBox.dart';
 
 class MyBottomModalSheet extends StatefulWidget {
   const MyBottomModalSheet(
-      {super.key, required this.title, required this.projectId});
+      {super.key, required this.title, required this.projectId, required this.workspaceId});
 
   final String projectId;
   final String title;
+  final String workspaceId;
 
   @override
   State<MyBottomModalSheet> createState() => _MyBottomModalSheetState();
@@ -54,6 +55,7 @@ class _MyBottomModalSheetState extends State<MyBottomModalSheet> {
       "finished_time": Timestamp.fromDate(DateTime.now()),
       "created_date": Timestamp.fromDate(DateTime.now()),
       "state": "inprogress",
+      "workspace_id": widget.workspaceId,
     };
     task_uid = await context.read<TaskCubit>().createTask(task);
   }

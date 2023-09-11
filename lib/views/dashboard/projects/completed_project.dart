@@ -20,7 +20,7 @@ class MyCompletedProjects extends StatefulWidget {
 class _MyCompletedProjectsState extends State<MyCompletedProjects> {
   ScrollController _scrollController = ScrollController();
   late final List<ProjectModel> finishedProject = widget.projects
-      .where((project) => project.state.toString() == "true")
+      .where((project) => project.state.toString() == "finished")
       .toList();
 
   @override

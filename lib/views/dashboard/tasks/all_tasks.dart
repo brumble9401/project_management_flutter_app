@@ -15,6 +15,8 @@ class MyAllTasks extends StatefulWidget {
 }
 
 class _MyAllTasksState extends State<MyAllTasks> {
+  late final List<TaskModel> uncompletedTasks =
+  widget.tasks.where((task) => task.state == "inprogress").toList();
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
@@ -26,15 +28,15 @@ class _MyAllTasksState extends State<MyAllTasks> {
         crossAxisSpacing: 10.w,
         childAspectRatio: 0.8,
       ),
-      itemCount: widget.tasks.length,
+      itemCount: uncompletedTasks.length,
       itemBuilder: (context, index) {
         return MyTaskCard2(
-          task: widget.tasks[index],
+          task: uncompletedTasks[index],
           onPressed: () {
             Navigator.pushNamed(
               context,
               RouteName.task_detail,
-              arguments: widget.tasks[index].id.toString(),
+              arguments: uncompletedTasks[index].id.toString(),
             );
           },
         );
