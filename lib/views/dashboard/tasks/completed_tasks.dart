@@ -5,9 +5,10 @@ import '../../../data/models/task/task_model.dart';
 import '../../widgets/card/task/task_card_2.dart';
 
 class MyCompletedTasks extends StatefulWidget {
-  const MyCompletedTasks({super.key, required this.tasks});
+  const MyCompletedTasks({super.key, required this.tasks, required this.name});
 
   final List<TaskModel> tasks;
+  final String name;
 
   @override
   State<MyCompletedTasks> createState() => _MyCompletedTasksState();
@@ -29,9 +30,17 @@ class _MyCompletedTasksState extends State<MyCompletedTasks> {
       ),
       itemCount: finishedProject.length,
       itemBuilder: (context, index) {
-        return MyTaskCard2(
-          task: finishedProject[index],
-        );
+        if(widget.name.isEmpty) {
+          return MyTaskCard2(
+            task: finishedProject[index],
+          );
+        } else if (finishedProject[index].name!.toLowerCase().startsWith(widget.name)) {
+          return MyTaskCard2(
+            task: finishedProject[index],
+          );
+        } else {
+          return Container();
+        }
       },
     );
   }

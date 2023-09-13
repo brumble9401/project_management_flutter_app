@@ -14,7 +14,9 @@ import '../../../theme/theme.dart';
 import '../../widgets/inputBox.dart';
 
 class MyProjectView extends StatefulWidget {
-  const MyProjectView({super.key});
+  const MyProjectView({super.key, required this.workspaceUid});
+
+  final String workspaceUid;
 
   @override
   State<MyProjectView> createState() => _MyProjectViewState();
@@ -23,6 +25,7 @@ class MyProjectView extends StatefulWidget {
 class _MyProjectViewState extends State<MyProjectView> {
   int _page = 0;
   String user_uid = FirebaseAuth.instance.currentUser!.uid;
+  String name = "";
 
   void onChangePage(index) {
     setState(() {
@@ -62,7 +65,41 @@ class _MyProjectViewState extends State<MyProjectView> {
                         padding: EdgeInsets.only(top: 20.h),
                         child: Column(
                           children: [
-                            const InputBox(label: "Search"),
+                            Container(
+                              height: 40.h,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15.0),
+                                border: Border.all(color: neutral_lightgrey),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: neutral_lightgrey,
+                                    spreadRadius: 2,
+                                    blurRadius: 9,
+                                    offset: Offset(
+                                        0, 3), // changes the position of the shadow
+                                  ),
+                                ],
+                              ),
+                              child: TextFormField(
+                                onChanged: (value) => setState(() {
+                                  name = value;
+                                }),
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(15),
+                                    ),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  fillColor: white,
+                                  filled: true,
+                                  labelText: "search",
+                                  labelStyle: TextStyle(
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ),
+                            ),
                             SizedBox(
                               height: 17.w,
                             ),
@@ -76,16 +113,18 @@ class _MyProjectViewState extends State<MyProjectView> {
                             StreamBuilder<List<ProjectModel>>(
                               stream: context
                                   .read<ProjectCubit>()
-                                  .getProjectFromFirestore(user_uid),
+                                  .getProjectFromWorkspaceUid(user_uid, widget.workspaceUid),
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
                                   final List<ProjectModel> projectList =
                                       snapshot.data!;
                                   if (projectList.isNotEmpty) {
                                     return _page == 0
-                                        ? MyAllProjects(projects: projectList)
+                                        ? MyAllProjects(projects: projectList, name: name,)
                                         : MyCompletedProjects(
-                                            projects: projectList);
+                                            projects: projectList,
+                                            name: name,
+                                        );
                                   } else {
                                     return const NoProjectCard();
                                   }

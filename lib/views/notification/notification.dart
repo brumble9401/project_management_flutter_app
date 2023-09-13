@@ -20,8 +20,24 @@ class _MyNotificationPageState extends State<MyNotificationPage> {
       child: Padding(
         padding: EdgeInsets.only(top: 10.h, left: 20.w, right: 20.w),
         child: Scaffold(
-          appBar: const MyAppBar(
-            title: "Notification",
+          appBar: AppBar(
+            titleSpacing: 0,
+            backgroundColor: white,
+            centerTitle: false,
+            shadowColor: Colors.transparent,
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Notification",
+                  style: TextStyle(
+                    color: neutral_dark,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24.sp,
+                  ),
+                ),
+              ],
+            ),
           ),
           body: Container(
             padding: EdgeInsets.only(top: 10.h, bottom: 10.h),

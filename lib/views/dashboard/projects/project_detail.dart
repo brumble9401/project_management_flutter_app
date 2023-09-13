@@ -30,6 +30,12 @@ import 'package:pma_dclv/views/widgets/card/task/task_add_card.dart';
 import 'package:pma_dclv/views/widgets/card/task/task_card_2.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 
+enum _MenuValues {
+  addUser,
+  markDone,
+  deleteProject,
+}
+
 class MyProjectDetail extends StatefulWidget {
   const MyProjectDetail({super.key, required this.project_id});
 
@@ -114,60 +120,57 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
                         Navigator.pop(context);
                       },
                       hasIconButton: true,
-                      menuList: [
-                        PopupMenuItem<String>(
-                          padding: EdgeInsets.zero,
-                          child: ListTile(
-                            onTap: () {
-                              Navigator.pushNamed(context, RouteName.add_user,
-                                  arguments: {'uids':[project.workspaceId, project.id], 'type': 'projects'});
-                            },
-                            title: Text(
-                              'Add user',
-                              style: TextStyle(
-                                color: neutral_dark,
-                                fontSize: 14.sp,
-                              ),
+                      btn: Container(
+                        width: 40.w, // Set the desired width
+                        height: 40.w,
+                        decoration: const BoxDecoration(
+                          color: primary,
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(
+                              10,
                             ),
                           ),
                         ),
-                        PopupMenuItem<String>(
-                          padding: EdgeInsets.zero,
-                          child: ListTile(
-                            onTap: () {
-                              context.read<ProjectCubit>().updateProjectStatus(widget.project_id, 'finished');
-                            },
-                            title: Text(
-                              'Mark done',
-                              style: TextStyle(
-                                color: neutral_dark,
-                                fontSize: 14.sp,
-                              ),
+                        child: PopupMenuButton<_MenuValues>(
+                          itemBuilder: (BuildContext context) => [
+                            const PopupMenuItem(
+                              value: _MenuValues.addUser,
+                              child: Text('Add users'),
                             ),
-                          ),
-                        ),
-                        const PopupMenuDivider(),
-                        PopupMenuItem<String>(
-                          padding: EdgeInsets.zero,
-                          child: ListTile(
-                            onTap: () {
-                              context.read<ProjectCubit>().deleteProject(widget.project_id).then((_) {
-                                Navigator.pop(context);
-                              }).catchError((error) {
-                                // Handle any errors here, if needed
-                                print("Error deleting project: $error");
-                              });
-                            },
-                            title: Text(
-                              'Delete project',
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontSize: 14.sp,
-                              ),
+                            const PopupMenuItem(
+                              value: _MenuValues.markDone,
+                              child: Text('Mark done'),
                             ),
-                          ),
+                            const PopupMenuItem(
+                              value: _MenuValues.deleteProject,
+                              child: Text('Delete project'),
+                            ),
+                          ],
+                          icon: Icon(FontAwesomeIcons.plus, color: white, size: 15.sp,),
+                          onSelected: (value) {
+                            switch (value) {
+                              case _MenuValues.addUser:
+                                Navigator.pushNamed(context, RouteName.add_user,
+                                    arguments: {'uids':[project.workspaceId, project.id], 'type': 'projects'});
+                                break;
+
+                              case _MenuValues.markDone:
+                                context.read<ProjectCubit>().updateProjectStatus(widget.project_id, 'finished');
+                                break;
+
+                              case _MenuValues.deleteProject:
+                                context.read<ProjectCubit>().deleteProject(widget.project_id).then((_) {
+                                  Navigator.pop(context);
+                                }).catchError((error) {
+                                  // Handle any errors here, if needed
+                                  print("Error deleting project: $error");
+                                });
+                                break;
+                            }
+                          },
                         ),
-                      ],
+                      ),
+
                     ),
                     body: Container(
                       decoration: const BoxDecoration(

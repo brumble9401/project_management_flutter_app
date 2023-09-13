@@ -24,6 +24,12 @@ import 'package:pma_dclv/views/widgets/comment_box.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 
+enum _MenuValues {
+  addUser,
+  markDone,
+  deleteProject,
+}
+
 class MyTaskDetail extends StatefulWidget {
   const MyTaskDetail({super.key, required this.taskId});
 
@@ -119,49 +125,51 @@ class _MyTaskDetailState extends State<MyTaskDetail> {
                         Navigator.pop(context);
                       },
                       hasIconButton: true,
-                      menuList: [
-                        PopupMenuItem<String>(
-                          padding: EdgeInsets.zero,
-                          child: ListTile(
-                            onTap: () {
-                              Navigator.pushNamed(context, RouteName.add_user,
-                                  arguments: {'uids':[task.workspaceId, task.id], 'type': 'tasks'});
-                            },
-                            title: Text(
-                              'Add user',
-                              style: TextStyle(
-                                color: neutral_dark,
-                                fontSize: 14.sp,
-                              ),
+                      btn: Container(
+                        width: 40.w, // Set the desired width
+                        height: 40.w,
+                        decoration: const BoxDecoration(
+                          color: primary,
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(
+                              10,
                             ),
                           ),
                         ),
-                        PopupMenuItem<String>(
-                          padding: EdgeInsets.zero,
-                          child: ListTile(
-                            onTap: () {
-                              context.read<TaskCubit>().updateTaskState(task.id.toString(), 'finished');
-                            },
-                            title: Text(
-                              'Mark done',
-                              style: TextStyle(
-                                color: semantic_green,
-                                fontSize: 14.sp,
-                              ),
+                        child: PopupMenuButton<_MenuValues>(
+                          itemBuilder: (BuildContext context) => [
+                            const PopupMenuItem(
+                              value: _MenuValues.addUser,
+                              child: Text('Add users'),
                             ),
-                          ),
-                        ),
-                        const PopupMenuDivider(),
-                        PopupMenuItem<String>(
-                          child: Text(
-                            'Delete task',
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 14.sp,
+                            const PopupMenuItem(
+                              value: _MenuValues.markDone,
+                              child: Text('Mark done'),
                             ),
-                          ),
+                            const PopupMenuItem(
+                              value: _MenuValues.deleteProject,
+                              child: Text('Delete project'),
+                            ),
+                          ],
+                          icon: Icon(FontAwesomeIcons.plus, color: white, size: 15.sp,),
+                          onSelected: (value) {
+                            switch (value) {
+                              case _MenuValues.addUser:
+                                Navigator.pushNamed(context, RouteName.add_user,
+                                    arguments: {'uids':[task.workspaceId, task.id], 'type': 'tasks'});
+                                break;
+
+                              case _MenuValues.markDone:
+                                context.read<TaskCubit>().updateTaskState(task.id.toString(), 'finished');
+                                break;
+
+                              case _MenuValues.deleteProject:
+
+                                break;
+                            }
+                          },
                         ),
-                      ],
+                      ),
                     ),
                     body: Container(
                       decoration: const BoxDecoration(

@@ -2,6 +2,7 @@ import 'package:dropdown_model_list/dropdown_model_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pma_dclv/data/models/workspaces/workspace.dart';
 import 'package:pma_dclv/theme/theme.dart';
 import 'package:pma_dclv/view-model/projects/project_cubit.dart';
@@ -12,9 +13,14 @@ import 'package:pma_dclv/views/dashboard/overview.dart';
 import 'package:pma_dclv/views/widgets/appbar/default_appbar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pma_dclv/views/widgets/bottomModalSheet/project_create_bottom_sheet.dart';
+import 'package:pma_dclv/views/widgets/button/iconButton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../view-model/user/user_cubit.dart';
+
+enum _MenuValues{
+  createProject,
+}
 
 class MyDashBoard extends StatefulWidget {
   const MyDashBoard({super.key});
@@ -61,30 +67,57 @@ class _MyDashBoardState extends State<MyDashBoard> {
           child: Scaffold(
             appBar: MyAppBar(
               title: "Dashboard",
-              onTap: () => showModalBottomSheet(
-                isScrollControlled: true,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(20),
+              btn: Container(
+                width: 40.w, // Set the desired width
+                height: 40.w,
+                decoration: const BoxDecoration(
+                  color: primary,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(
+                      10,
+                    ),
                   ),
                 ),
-                context: context,
-                builder: (BuildContext context) => MultiBlocProvider(
-                    providers: [
-                      BlocProvider(
-                        create: (context) => WorkspaceCubit(),
-                      ),
-                      BlocProvider(
-                        create: (context) => ProjectCubit(),
-                      ),
-                      BlocProvider(
-                        create: (context) => UserCubit(),
-                      ),
-                    ],
-                    child: MyProjectBottomModalSheet(
-                      title: "Create Project",
-                      workspaceUid: workspaceUid.toString(),
+                child: PopupMenuButton<_MenuValues>(
+                  itemBuilder: (BuildContext context) => [
+                    const PopupMenuItem(
+                      value: _MenuValues.createProject,
+                      child: Text('New project'),
                     ),
+                  ],
+                  icon: Icon(FontAwesomeIcons.plus, color: white, size: 15.sp,),
+                  onSelected: (value) {
+                    switch (value) {
+                      case _MenuValues.createProject:
+                        showModalBottomSheet(
+                          isScrollControlled: true,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(20),
+                            ),
+                          ),
+                          context: context,
+                          builder: (BuildContext context) => MultiBlocProvider(
+                            providers: [
+                              BlocProvider(
+                              create: (context) => WorkspaceCubit(),
+                              ),
+                              BlocProvider(
+                              create: (context) => ProjectCubit(),
+                              ),
+                              BlocProvider(
+                              create: (context) => UserCubit(),
+                              ),
+                            ],
+                            child: MyProjectBottomModalSheet(
+                              title: "Create Project",
+                              workspaceUid: workspaceUid.toString(),
+                            ),
+                          )
+                        );
+                        break;
+                    }
+                  },
                 ),
               ),
             ),
@@ -137,7 +170,7 @@ class _MyDashBoardState extends State<MyDashBoard> {
           .read<WorkspaceCubit>()
           .getWorkspaceFromUser(_auth.currentUser!.uid),
       builder: (context, snapshot) {
-        if (snapshot.hasData && snapshot.data!.length > 0) {
+        if (snapshot.hasData && snapshot.data!.isNotEmpty) {
           List<OptionItem> options = snapshot.data!
               .map((workspace) => OptionItem(
                     // Create an OptionItem using workspace properties

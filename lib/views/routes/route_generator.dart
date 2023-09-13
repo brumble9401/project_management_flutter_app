@@ -73,16 +73,18 @@ class RouteGenerator {
         break;
 
       case RouteName.projects:
+        final String workspaceUid = settings.arguments as String;
         page = BlocProvider(
           create: (context) => ProjectCubit(),
-          child: const MyProjectView(),
+          child: MyProjectView(workspaceUid: workspaceUid,),
         );
         break;
 
       case RouteName.tasks:
+        final String workspaceUid = settings.arguments as String;
         page = BlocProvider(
           create: (context) => TaskCubit(),
-          child: const MyTaskView(),
+          child: MyTaskView(workspaceUid: workspaceUid,),
         );
         break;
 

@@ -33,8 +33,24 @@ class _MySettingPageState extends State<MySettingPage> {
         color: white,
       ),
       child: Scaffold(
-        appBar: const MyAppBar(
-          title: "Setting",
+        appBar: AppBar(
+          titleSpacing: 0,
+          backgroundColor: white,
+          centerTitle: false,
+          shadowColor: Colors.transparent,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Notification",
+                style: TextStyle(
+                  color: neutral_dark,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24.sp,
+                ),
+              ),
+            ],
+          ),
         ),
         body: Container(
           decoration: const BoxDecoration(color: white),

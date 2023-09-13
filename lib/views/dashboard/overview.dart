@@ -41,7 +41,7 @@ class _MyOverViewState extends State<MyOverView> {
       children: [
         CustomTextButton(
           onPressed: () {
-            Navigator.pushNamed(context, RouteName.projects);
+            Navigator.pushNamed(context, RouteName.projects, arguments: widget.workspaceUid.toString());
           },
           title: "Your projects",
           icon_url: "assets/icons/Project.png",
@@ -72,7 +72,7 @@ class _MyOverViewState extends State<MyOverView> {
         ),
         CustomTextButton(
           onPressed: () {
-            Navigator.pushNamed(context, RouteName.tasks);
+            Navigator.pushNamed(context, RouteName.tasks, arguments: widget.workspaceUid.toString());
           },
           title: "Your tasks",
           icon_url: "assets/icons/Task.png",

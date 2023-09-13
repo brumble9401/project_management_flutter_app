@@ -8,12 +8,15 @@ import 'package:pma_dclv/views/dashboard/tasks/all_tasks.dart';
 import 'package:pma_dclv/views/dashboard/tasks/completed_tasks.dart';
 import 'package:pma_dclv/views/dashboard/tasks/task_tab.dart';
 import 'package:pma_dclv/views/widgets/appbar/center_title_appbar.dart';
+import 'package:pma_dclv/views/widgets/card/task/no_task_card.dart';
 
 import '../../../theme/theme.dart';
 import '../../widgets/inputBox.dart';
 
 class MyTaskView extends StatefulWidget {
-  const MyTaskView({super.key});
+  const MyTaskView({super.key, required this.workspaceUid});
+
+  final String workspaceUid;
 
   @override
   State<MyTaskView> createState() => _MyTaskViewState();
@@ -22,6 +25,8 @@ class MyTaskView extends StatefulWidget {
 class _MyTaskViewState extends State<MyTaskView> {
   int _page = 0;
   String user_uid = "";
+  String name = "";
+
 
   void getUserId() {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
@@ -72,7 +77,41 @@ class _MyTaskViewState extends State<MyTaskView> {
                         padding: EdgeInsets.only(top: 20.h),
                         child: Column(
                           children: [
-                            const InputBox(label: "Search"),
+                            Container(
+                              height: 40.h,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15.0),
+                                border: Border.all(color: neutral_lightgrey),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: neutral_lightgrey,
+                                    spreadRadius: 2,
+                                    blurRadius: 9,
+                                    offset: Offset(
+                                        0, 3), // changes the position of the shadow
+                                  ),
+                                ],
+                              ),
+                              child: TextFormField(
+                                onChanged: (value) => setState(() {
+                                  name = value;
+                                }),
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(15),
+                                    ),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  fillColor: white,
+                                  filled: true,
+                                  labelText: "search",
+                                  labelStyle: TextStyle(
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ),
+                            ),
                             SizedBox(
                               height: 17.w,
                             ),
@@ -86,7 +125,7 @@ class _MyTaskViewState extends State<MyTaskView> {
                             StreamBuilder<List<TaskModel>>(
                               stream: context
                                   .read<TaskCubit>()
-                                  .getAllTaskFromFirestore(user_uid),
+                                  .getAllTaskFromWorkspace(user_uid, widget.workspaceUid),
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
                                   final List<TaskModel> tasks = snapshot.data!;
@@ -94,12 +133,14 @@ class _MyTaskViewState extends State<MyTaskView> {
                                     return _page == 0
                                         ? MyAllTasks(
                                             tasks: tasks,
+                                            name: name,
                                           )
                                         : MyCompletedTasks(
                                             tasks: tasks,
+                                            name: name,
                                           );
                                   } else {
-                                    return Container();
+                                    return const NoTaskCard();
                                   }
                                 } else if (snapshot.hasError) {
                                   return Text('Error: ${snapshot.error}');

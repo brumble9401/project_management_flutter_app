@@ -10,9 +10,11 @@ class MyAllProjects extends StatefulWidget {
   const MyAllProjects({
     super.key,
     required this.projects,
+    required this.name,
   });
 
   final List<ProjectModel> projects;
+  final String name;
 
   @override
   State<MyAllProjects> createState() => _MyAllProjectsState();
@@ -30,23 +32,38 @@ class _MyAllProjectsState extends State<MyAllProjects> {
       return const NoProjectCard();
     } else {
       return ListView.builder(
-      controller: _scrollController,
-      shrinkWrap: true,
-      scrollDirection: Axis.vertical,
-      itemCount: projects.length,
-      itemBuilder: (BuildContext context, int index) {
-        return Padding(
-          padding: EdgeInsets.symmetric(vertical: 8.h),
-          child: MyProjectCard(
-            project: projects[index],
-            onPressed: () {
-              Navigator.pushNamed(context, RouteName.project_detail,
-                  arguments: projects[index].id.toString());
-            },
-          ),
-        );
-      },
-    );
+        controller: _scrollController,
+        shrinkWrap: true,
+        scrollDirection: Axis.vertical,
+        itemCount: projects.length,
+        itemBuilder: (BuildContext context, int index) {
+          if(widget.name.isEmpty) {
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.h),
+              child: MyProjectCard(
+                project: projects[index],
+                onPressed: () {
+                  Navigator.pushNamed(context, RouteName.project_detail,
+                      arguments: projects[index].id.toString());
+                },
+              ),
+            );
+          } else if(projects[index].name!.toLowerCase().startsWith(widget.name)) {
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.h),
+              child: MyProjectCard(
+                project: projects[index],
+                onPressed: () {
+                  Navigator.pushNamed(context, RouteName.project_detail,
+                      arguments: projects[index].id.toString());
+                },
+              ),
+            );
+          } else {
+            return Container();
+          }
+        },
+      );
     }
   }
 

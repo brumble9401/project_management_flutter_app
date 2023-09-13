@@ -11,13 +11,13 @@ class MyNonTitleAppbar extends StatelessWidget implements PreferredSizeWidget {
     // required this.title,
     this.hasIconButton,
     this.onPressed,
-    required this.menuList,
+    required this.btn,
   });
 
   // final String title;
   final bool? hasIconButton;
   final void Function()? onPressed;
-  final List<PopupMenuEntry<String>> menuList;
+  final Widget btn;
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -44,33 +44,11 @@ class MyNonTitleAppbar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
           hasButton
-              ? IconBtn(
-                  onPressed: () => showPopupMenu(context),
-                  icon: const Icon(
-                    FontAwesomeIcons.plus,
-                    size: 15,
-                  ),
-                )
+              ? btn
               : const Text(""),
         ],
       ),
     );
   }
 
-  void showPopupMenu(BuildContext context) {
-    final RenderBox appBarRenderBox = context.findRenderObject() as RenderBox;
-    final appBarSize = appBarRenderBox.size;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    showMenu<String>(
-      context: context,
-      position: RelativeRect.fromLTRB(
-        appBarSize.width - 50.0,
-        appBarSize.height + kToolbarHeight,
-        appBarSize.width - 10.0,
-        screenHeight,
-      ),
-      items: menuList,
-    );
-  }
 }
