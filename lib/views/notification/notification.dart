@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:pma_dclv/data/models/notification/notification_model.dart';
 import 'package:pma_dclv/theme/theme.dart';
-import 'package:pma_dclv/views/widgets/appbar/default_appbar.dart';
+import 'package:pma_dclv/view-model/noti/notification.dart';
 import 'package:pma_dclv/views/widgets/card/noti_card.dart';
 
 class MyNotificationPage extends StatefulWidget {
@@ -13,6 +16,8 @@ class MyNotificationPage extends StatefulWidget {
 }
 
 class _MyNotificationPageState extends State<MyNotificationPage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -95,12 +100,33 @@ class _MyNotificationPageState extends State<MyNotificationPage> {
                       )
                     ],
                   ),
-                  const MyNotificationCard(),
-                  const MyNotificationCard(),
-                  const MyNotificationCard(),
-                  const MyNotificationCard(),
-                  const MyNotificationCard(),
-                  const MyNotificationCard(),
+                  StreamBuilder<List<NotificationModel>>(
+                    stream: context.read<NotificationCubit>().getNotificationHistory(_auth.currentUser!.uid),
+                    builder: (context, snapshot){
+                      if(snapshot.hasData){
+                        List<NotificationModel> noti = snapshot.data!;
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: noti.length,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            return MyNotificationCard(
+                              notificationModel: noti[index],
+                              onPress: (){
+                                context.read<NotificationCubit>().updateReadStatus(noti[index].uid.toString());
+                              },
+                            );
+                          },
+                        );
+                      }
+                      else if(snapshot.hasError){
+                        print(snapshot.hasError);
+                        return Container();
+                      } else {
+                        return Container();
+                      }
+                    },
+                  ),
                 ],
               ),
             ),

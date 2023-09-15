@@ -227,7 +227,7 @@ class ChatRemoteSource extends ChatRemote {
       });
     }
 
-    return messageRef.add(message).then((value) => NotificationServices().sendPushNotification(user, text));
+    return messageRef.add(message).then((value) => NotificationServices().sendPushNotification(user, text, sender));
   }
 
   @override

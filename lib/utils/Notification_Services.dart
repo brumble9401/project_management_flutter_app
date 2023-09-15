@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart';
 import 'package:pma_dclv/data/models/user/user_model.dart';
@@ -9,6 +10,7 @@ import 'package:pma_dclv/utils/local_notification_service.dart';
 
 class NotificationServices {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<void> requestNotificationPermission() async {
     NotificationSettings settings = await messaging.requestPermission(
@@ -30,6 +32,19 @@ class NotificationServices {
 
     print('User granted permission: ${settings.authorizationStatus}');
   }
+  
+  Future<void> storeNotification(RemoteMessage message) async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    
+    firestore.collection('notifications').add({
+      "title": message.notification!.title,
+      "body": message.notification!.body,
+      "payload": message.data,
+      "receiver": _auth.currentUser!.uid,
+      "read": "false",
+      "created_date": Timestamp.fromDate(DateTime.now()),
+    });
+  }
 
   Future<String> getToken() async {
     final FCMToken = await messaging.getToken();
@@ -44,6 +59,8 @@ class NotificationServices {
     print('Payload: ${message.data}');
 
     LocalNotificationService.display(message);
+
+    await storeNotification(message);
   }
 
   Future<void> handleOnOpenedApp(RemoteMessage message) async {
@@ -53,13 +70,16 @@ class NotificationServices {
     print('Payload: ${message.data}');
 
     LocalNotificationService.display(message);
+
+    await storeNotification(message);
   }
 
-  Future<void> sendPushNotification(UserModel user, String msg) async {
+  Future<void> sendPushNotification(UserModel user, String msg, String sender) async {
     final body = {
       "to": user.pushToken,
+      "data":{"senderId": sender},
       "notification": {
-        "title": "${user.firstName} ${user.lastName}",
+        "title": "Message from: ${user.firstName} ${user.lastName}",
         "body": msg,
       }
     };

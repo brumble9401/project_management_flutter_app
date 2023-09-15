@@ -112,7 +112,7 @@ class _MyOverViewState extends State<MyOverView> {
                   return Container(
                     decoration: const BoxDecoration(
                       color: white,
-                    ), // Add white background color
+                    ),
                     child: const Center(
                       child: NoTaskCard(),
                     ),

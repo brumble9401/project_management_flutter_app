@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pma_dclv/theme/theme.dart';
 import 'package:pma_dclv/view-model/chat/chat_cubit.dart';
+import 'package:pma_dclv/view-model/noti/notification.dart';
 import 'package:pma_dclv/view-model/projects/project_cubit.dart';
 import 'package:pma_dclv/view-model/tasks/task_cubit.dart';
 import 'package:pma_dclv/view-model/user/user_cubit.dart';
@@ -57,7 +58,12 @@ class _MyHomePageState extends State<MyHomePage> {
       ],
       child: MyChatPage(),
     ),
-    const MyNotificationPage(),
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => NotificationCubit())
+      ],
+      child: const MyNotificationPage(),
+    ),
     BlocProvider(
       create: (context) => WorkspaceCubit(),
       child: const MySettingPage(),
