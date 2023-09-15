@@ -38,6 +38,9 @@ class ChatRemoteSource extends ChatRemote {
         final id = chatRoomDoc.id;
         final users = List<String>.from(chatRoomData['users']);
         final lastMess = chatRoomData['last_mess'];
+        final read = chatRoomData['read'];
+        final createdDate = chatRoomData['created_date'];
+        final sender = chatRoomData['sender'];
 
         // Fetch messages for the current chat room
         final messagesSnapshot = await chatRoomDoc.reference
@@ -61,6 +64,9 @@ class ChatRemoteSource extends ChatRemote {
           users: users,
           messages: messages,
           lastMess: lastMess,
+          createdDate: createdDate.toDate(),
+          read: read,
+          sender: sender,
         );
       }));
 
@@ -92,6 +98,9 @@ class ChatRemoteSource extends ChatRemote {
         final chatRoomData = chatRoomDoc.data();
         final id = chatRoomDoc.id;
         final users = List<String>.from(chatRoomData['users']);
+        final read = chatRoomData['read'];
+        final createdDate = chatRoomData['created_date'];
+        final sender = chatRoomData['sender'];
 
         // Fetch messages for the chat room
         final messagesSnapshot =
@@ -113,6 +122,9 @@ class ChatRemoteSource extends ChatRemote {
           id: id,
           users: users,
           messages: messages,
+          read: read,
+          createdDate: createdDate.toDate(),
+          sender: sender,
         );
 
         // Yield the chat room
@@ -131,6 +143,9 @@ class ChatRemoteSource extends ChatRemote {
         final chatRoomDoc = snapshot.data();
         final id = snapshot.id;
         final users = List<String>.from(chatRoomDoc!['users']);
+        final read = chatRoomDoc['read'];
+        final createdDate = chatRoomDoc['created_date'];
+        final sender = chatRoomDoc['sender'];
 
         // Fetch messages for the chat room
         final messagesSnapshot = await docRef
@@ -155,6 +170,9 @@ class ChatRemoteSource extends ChatRemote {
           id: id,
           users: users,
           messages: messages,
+          read: read,
+          createdDate: createdDate.toDate(),
+          sender: sender,
         );
       } else {
         return ChatRoom();
@@ -169,8 +187,11 @@ class ChatRemoteSource extends ChatRemote {
           FirebaseFirestore.instance.collection('chatRooms');
       final DocumentReference<Map<String, dynamic>> newRoomRef =
           await chatRoomRef.add({
-        'users': [userId1, userId2],
-        'last_mess': '',
+            'users': [userId1, userId2],
+            'last_mess': '',
+            'read': 'false',
+            'created_date': Timestamp.fromDate(DateTime.now()),
+            'sender': '',
       });
       print('New project created successfully}!');
       return newRoomRef.id;
@@ -205,6 +226,7 @@ class ChatRemoteSource extends ChatRemote {
 
   @override
   Future<void> sendMessage(String chatRoomId, String sender, String text, UserModel user, String type) {
+    final date = Timestamp.now();
     final messageRef = _firestore
         .collection('chatRooms')
         .doc(chatRoomId)
@@ -212,7 +234,7 @@ class ChatRemoteSource extends ChatRemote {
     final message = {
       'user_id': sender,
       'content': text,
-      'created_date': Timestamp.now(),
+      'created_date': date,
       'read_by': [],
       'type': type,
     };
@@ -220,10 +242,16 @@ class ChatRemoteSource extends ChatRemote {
     if(type == 'text') {
       _firestore.collection('chatRooms').doc(chatRoomId).update({
         'last_mess': text,
+        'created_date': date,
+        'read': 'false',
+        'sender': sender,
       });
     } else if(type == 'image'){
       _firestore.collection('chatRooms').doc(chatRoomId).update({
         'last_mess': '[Image]',
+        'created_date': date,
+        'read': 'false',
+        'sender': sender,
       });
     }
 
@@ -241,5 +269,7 @@ class ChatRemoteSource extends ChatRemote {
         .update({
       'read_by': [userId]
     });
+
+    await _firestore.collection('chatRooms').doc(roomId).update({"read": "true"});
   }
 }

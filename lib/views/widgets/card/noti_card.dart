@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pma_dclv/data/models/notification/notification_model.dart';
+import 'package:pma_dclv/data/models/user/user_model.dart';
 import 'package:pma_dclv/theme/theme.dart';
+import 'package:pma_dclv/view-model/user/user_cubit.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class MyNotificationCard extends StatelessWidget {
@@ -49,15 +52,25 @@ class MyNotificationCard extends StatelessWidget {
                     SizedBox(
                       height: 3.h,
                     ),
-                    Text(
-                      "${notificationModel.title.toString()} sent a message",
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        color: neutral_dark,
-                        fontWeight: FontWeight.bold,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      softWrap: true,
+                    StreamBuilder<UserModel>(
+                      stream: context.read<UserCubit>().getUserFromUid(notificationModel.payload!['senderId']),
+                      builder: (context, snapshot) {
+                        if(snapshot.hasData) {
+                          UserModel user = snapshot.data!;
+                          return Text(
+                            "${notificationModel.title.toString()} from ${user.firstName} ${user.lastName}",
+                            style: TextStyle(
+                              fontSize: 15.sp,
+                              color: neutral_dark,
+                              fontWeight: FontWeight.bold,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            softWrap: true,
+                          );
+                        } else {
+                          return Container();
+                        }
+                      }
                     ),
                     Text(
                       notificationModel.body.toString(),

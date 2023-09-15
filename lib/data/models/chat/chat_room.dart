@@ -21,11 +21,17 @@ class ChatRoom {
   final List<String>? users;
   final List<MessageModel>? messages;
   final String? lastMess;
+  final DateTime? createdDate;
+  final String? read;
+  final String? sender;
 
   ChatRoom({
     this.id,
     this.users,
     this.messages,
     this.lastMess,
+    this.createdDate,
+    this.read,
+    this.sender,
   });
 }

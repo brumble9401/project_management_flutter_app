@@ -40,7 +40,7 @@ class NotificationServices {
       "title": message.notification!.title,
       "body": message.notification!.body,
       "payload": message.data,
-      "receiver": _auth.currentUser!.uid,
+      "receiver": message.data['receiver'],
       "read": "false",
       "created_date": Timestamp.fromDate(DateTime.now()),
     });
@@ -77,9 +77,9 @@ class NotificationServices {
   Future<void> sendPushNotification(UserModel user, String msg, String sender) async {
     final body = {
       "to": user.pushToken,
-      "data":{"senderId": sender},
+      "data":{"senderId": sender, "receiver": user.id},
       "notification": {
-        "title": "Message from: ${user.firstName} ${user.lastName}",
+        "title": "Message",
         "body": msg,
       }
     };

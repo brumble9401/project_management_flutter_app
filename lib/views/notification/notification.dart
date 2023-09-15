@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pma_dclv/data/models/notification/notification_model.dart';
 import 'package:pma_dclv/theme/theme.dart';
 import 'package:pma_dclv/view-model/noti/notification.dart';
+import 'package:pma_dclv/view-model/user/user_cubit.dart';
 import 'package:pma_dclv/views/widgets/card/noti_card.dart';
 
 class MyNotificationPage extends StatefulWidget {
@@ -105,17 +106,28 @@ class _MyNotificationPageState extends State<MyNotificationPage> {
                     builder: (context, snapshot){
                       if(snapshot.hasData){
                         List<NotificationModel> noti = snapshot.data!;
+                        noti.sort((a, b) =>
+                            b.createdDate!.compareTo(a.createdDate!));
                         return ListView.builder(
                           shrinkWrap: true,
                           itemCount: noti.length,
                           physics: const NeverScrollableScrollPhysics(),
                           itemBuilder: (context, index) {
-                            return MyNotificationCard(
-                              notificationModel: noti[index],
-                              onPress: (){
-                                context.read<NotificationCubit>().updateReadStatus(noti[index].uid.toString());
-                              },
+                            return BlocProvider(
+                              create: (context) => UserCubit(),
+                              child: MyNotificationCard(
+                                notificationModel: noti[index],
+                                onPress: (){
+                                  context.read<NotificationCubit>().updateReadStatus(noti[index].uid.toString());
+                                },
+                              ),
                             );
+                            // return MyNotificationCard(
+                            //   notificationModel: noti[index],
+                            //   onPress: (){
+                            //     context.read<NotificationCubit>().updateReadStatus(noti[index].uid.toString());
+                            //   },
+                            // );
                           },
                         );
                       }

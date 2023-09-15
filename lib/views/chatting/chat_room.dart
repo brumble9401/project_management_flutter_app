@@ -337,7 +337,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     String friendUid,
   ) {
     if (message.readBy.isEmpty) {
-      if (userUid != message.senderId) {
+      if (userUid.toString() != message.senderId.toString()) {
         context
             .read<ChatCubit>()
             .updateReadStatus(userUid, widget.chatRoomUid, message.id);

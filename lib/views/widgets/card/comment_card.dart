@@ -40,7 +40,7 @@ class _MyCommentCardState extends State<MyCommentCard> {
                 UserModel user = snapshot.data!;
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Container(
                       width: 50.w,
@@ -50,13 +50,15 @@ class _MyCommentCardState extends State<MyCommentCard> {
                       ),
                       child: CircleAvatar(
                         radius: 30.w,
-                        backgroundImage:
-                            const AssetImage("assets/images/dog.jpg"),
+                        backgroundImage: snapshot.data!.avatar == ''
+                            ? const NetworkImage(
+                            'https://img.myloview.com/posters/default-avatar-profile-icon-vector-social-media-user-photo-400-205577532.jpg')
+                            : NetworkImage(snapshot.data!.avatar!),
                         backgroundColor: Colors.transparent,
                       ),
                     ),
                     SizedBox(
-                      width: 12.w,
+                      width: 20.w,
                     ),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,

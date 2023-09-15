@@ -6,6 +6,7 @@ import 'package:pma_dclv/data/models/chat/chat_room.dart';
 import 'package:pma_dclv/data/models/user/user_model.dart';
 import 'package:pma_dclv/theme/theme.dart';
 import 'package:pma_dclv/view-model/user/user_cubit.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class MyChatCard extends StatefulWidget {
   const MyChatCard({super.key, this.onPressed, required this.chatRoom});
@@ -22,6 +23,9 @@ class _MyChatCardState extends State<MyChatCard> {
 
   @override
   Widget build(BuildContext context) {
+    final difference = DateTime.now().difference(widget.chatRoom.createdDate!);
+    final timeAgo = timeago.format(DateTime.now().subtract(difference), locale: 'en', );
+
     return Container(
       width: double.infinity,
       height: 70.h,
@@ -65,8 +69,9 @@ class _MyChatCardState extends State<MyChatCard> {
                       backgroundColor: Colors.transparent,
                     ),
                   ),
+                  SizedBox(width: 10.w),
                   SizedBox(
-                    width: 180.w,
+                    width: 170.w,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -75,7 +80,7 @@ class _MyChatCardState extends State<MyChatCard> {
                           height: 3.w,
                         ),
                         Text(
-                          '${snapshot.data!.lastName!} ${snapshot.data!.firstName!}',
+                          '${snapshot.data!.firstName!} ${snapshot.data!.lastName!}',
                           style: TextStyle(
                             fontSize: 15.w,
                             fontWeight: FontWeight.bold,
@@ -88,7 +93,7 @@ class _MyChatCardState extends State<MyChatCard> {
                           style: TextStyle(
                             fontSize: 13.sp,
                             overflow: TextOverflow.ellipsis,
-                            color: neutral_dark,
+                            color: widget.chatRoom.sender != _auth.currentUser!.uid && widget.chatRoom.read == "false" ? neutral_dark : neutral_grey,
                           ),
                         ),
                         SizedBox(
@@ -107,13 +112,13 @@ class _MyChatCardState extends State<MyChatCard> {
                       Container(
                         width: 11.w,
                         height: 11.w,
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: primary,
+                          color: widget.chatRoom.sender != _auth.currentUser!.uid && widget.chatRoom.read == "false" ? primary : white,
                         ),
                       ),
                       Text(
-                        "10 mins",
+                        timeAgo,
                         style: TextStyle(
                           fontSize: 10.w,
                           color: neutral_grey,
