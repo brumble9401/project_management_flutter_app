@@ -12,11 +12,13 @@ class MyCenterTitleAppBar extends StatelessWidget
     required this.title,
     this.hasIconButton,
     this.onPressed,
+    this.btn,
   });
 
   final String title;
   final bool? hasIconButton;
   final void Function()? onPressed;
+  final Widget? btn;
 
   @override
   // TODO: implement preferredSize
@@ -52,14 +54,8 @@ class MyCenterTitleAppBar extends StatelessWidget
             ),
           ),
           hasButton
-              ? IconBtn(
-                  onPressed: () {},
-                  icon: const Icon(
-                    FontAwesomeIcons.plus,
-                    size: 15,
-                  ),
-                )
-              : const Text(""),
+              ? btn!
+              : Container(width: 40.w,),
         ],
       ),
     );

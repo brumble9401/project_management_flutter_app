@@ -797,7 +797,7 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
                   ),
                 ),
                 Container(
-                  height: 150.h,
+                  height: 180.h,
                   decoration: const BoxDecoration(
                     color: white,
                   ),

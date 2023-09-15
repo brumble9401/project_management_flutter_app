@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pma_dclv/theme/theme.dart';
 import 'package:pma_dclv/views/home.dart';
 import 'package:pma_dclv/views/widgets/button/iconButton.dart';
@@ -147,14 +148,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                       IconBtn(
                         onPressed: () {},
-                        icon: const Icon(Icons.safety_check),
-                      ),
-                      const SizedBox(
-                        width: 20,
-                      ),
-                      IconBtn(
-                        onPressed: () {},
-                        icon: const Icon(Icons.abc),
+                        icon: Icon(FontAwesomeIcons.google, size: 17.sp,),
                       ),
                     ],
                   ),

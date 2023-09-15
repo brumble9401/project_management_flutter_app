@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pma_dclv/data/models/workspaces/workspace.dart';
+import 'package:pma_dclv/main.dart';
 import 'package:pma_dclv/theme/theme.dart';
 import 'package:pma_dclv/view-model/user/user_cubit.dart';
 import 'package:pma_dclv/view-model/workspace/workspace_cubit.dart';
-import 'package:pma_dclv/views/widget_tree.dart';
-import 'package:pma_dclv/views/widgets/appbar/default_appbar.dart';
 import 'package:pma_dclv/views/widgets/button/button.dart';
 import 'package:pma_dclv/views/widgets/button/text_icon_button.dart';
 import 'package:pma_dclv/views/widgets/card/workspace_card.dart';
@@ -124,13 +123,7 @@ class _MySettingPageState extends State<MySettingPage> {
               BlocConsumer<AuthCubit, AuthState>(
                 listener: (context, state) {
                   if (state.authStatus == AuthStatus.success) {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MyWidgetTree(),
-                      ),
-                      (route) => false,
-                    );
+                    Navigator.pushReplacement( context, MaterialPageRoute(builder: (context) => MyApp(initialRoot: '',)));
                   }
                 },
                 builder: (context, state) {

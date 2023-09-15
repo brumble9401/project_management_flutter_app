@@ -19,6 +19,7 @@ class _MyTaskCard2State extends State<MyTaskCard2> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: 150.w,
       decoration: BoxDecoration(
         color: white,
         border: Border.all(color: neutral_lightgrey),

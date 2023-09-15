@@ -65,7 +65,7 @@ class _MyTaskViewState extends State<MyTaskView> {
                 Navigator.pop(context);
               },
               title: "Tasks",
-              hasIconButton: true,
+              hasIconButton: false,
             ),
             body: Container(
               decoration: const BoxDecoration(color: white),

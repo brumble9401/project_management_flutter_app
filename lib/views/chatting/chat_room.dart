@@ -473,12 +473,24 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                             ),
                                     ),
                                     padding: const EdgeInsets.all(12.0),
-                                    child: Text(
-                                      message.content,
-                                      style: TextStyle(
-                                        color:
-                                            isMe ? Colors.white : Colors.black,
-                                        // overflow: TextOverflow.fade,
+                                    child: Container(
+                                      child: message.type == 'text' ? Text(
+                                        message.content,
+                                        style: TextStyle(
+                                          color: isMe ? Colors.white : Colors.black,
+                                        ),
+                                      ) : ClipRRect(
+                                        borderRadius: BorderRadius.circular(15),
+                                        child: CachedNetworkImage(
+                                          imageUrl: message.content,
+
+                                          placeholder: (context, url) => const Padding(
+                                            padding: EdgeInsets.all(8.0),
+                                            child: CircularProgressIndicator(strokeWidth: 2),
+                                          ),
+                                          errorWidget: (context, url, error) =>
+                                          const Icon(Icons.image, size: 70),
+                                        ),
                                       ),
                                     ),
                                   ),
