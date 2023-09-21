@@ -2,6 +2,7 @@ import 'package:dropdown_model_list/dropdown_model_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pma_dclv/data/models/workspaces/workspace.dart';
 import 'package:pma_dclv/theme/theme.dart';
@@ -11,14 +12,12 @@ import 'package:pma_dclv/views/dashboard/analytics.dart';
 import 'package:pma_dclv/views/dashboard/dashboard_tab.dart';
 import 'package:pma_dclv/views/dashboard/overview.dart';
 import 'package:pma_dclv/views/widgets/appbar/default_appbar.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pma_dclv/views/widgets/bottomModalSheet/project_create_bottom_sheet.dart';
-import 'package:pma_dclv/views/widgets/button/iconButton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../view-model/user/user_cubit.dart';
 
-enum _MenuValues{
+enum _MenuValues {
   createProject,
 }
 
@@ -85,36 +84,40 @@ class _MyDashBoardState extends State<MyDashBoard> {
                       child: Text('New project'),
                     ),
                   ],
-                  icon: Icon(FontAwesomeIcons.plus, color: white, size: 15.sp,),
+                  icon: Icon(
+                    FontAwesomeIcons.plus,
+                    color: white,
+                    size: 15.sp,
+                  ),
                   onSelected: (value) {
                     switch (value) {
                       case _MenuValues.createProject:
                         showModalBottomSheet(
-                          isScrollControlled: true,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(20),
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(20),
+                              ),
                             ),
-                          ),
-                          context: context,
-                          builder: (BuildContext context) => MultiBlocProvider(
-                            providers: [
-                              BlocProvider(
-                              create: (context) => WorkspaceCubit(),
-                              ),
-                              BlocProvider(
-                              create: (context) => ProjectCubit(),
-                              ),
-                              BlocProvider(
-                              create: (context) => UserCubit(),
-                              ),
-                            ],
-                            child: MyProjectBottomModalSheet(
-                              title: "Create Project",
-                              workspaceUid: workspaceUid.toString(),
-                            ),
-                          )
-                        );
+                            context: context,
+                            builder: (BuildContext context) =>
+                                MultiBlocProvider(
+                                  providers: [
+                                    BlocProvider(
+                                      create: (context) => WorkspaceCubit(),
+                                    ),
+                                    BlocProvider(
+                                      create: (context) => ProjectCubit(),
+                                    ),
+                                    BlocProvider(
+                                      create: (context) => UserCubit(),
+                                    ),
+                                  ],
+                                  child: MyProjectBottomModalSheet(
+                                    title: "Create Project",
+                                    workspaceUid: workspaceUid.toString(),
+                                  ),
+                                ));
                         break;
                     }
                   },
@@ -201,7 +204,7 @@ class _MyDashBoardState extends State<MyDashBoard> {
             paddingRight: 0,
             borderColor: neutral_grey,
             arrowColor: neutral_dark,
-            heightBottomContainer: snapshot.data!.length.toDouble() * 40.h,
+            heightBottomContainer: snapshot.data!.length.toDouble() * 50.h,
             icon: const Icon(
               Icons.workspace_premium_outlined,
               color: neutral_dark,

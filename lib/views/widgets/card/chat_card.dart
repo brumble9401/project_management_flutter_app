@@ -71,7 +71,7 @@ class _MyChatCardState extends State<MyChatCard> {
                   ),
                   SizedBox(width: 10.w),
                   SizedBox(
-                    width: 170.w,
+                    width: 160.w,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,

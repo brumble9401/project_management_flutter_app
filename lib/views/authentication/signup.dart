@@ -37,6 +37,8 @@ class _SignupScreenState extends State<SignupScreen> {
       "last_name": _lastNameController.text,
       "email": _emailController.text,
       "avatar": "",
+      "pushToken": "",
+      "workspace_id": [],
     };
     await context
         .read<AuthCubit>()

@@ -31,8 +31,15 @@ class RouteGenerator {
     Widget? page;
     switch (settings.name) {
       case RouteName.initialRoot:
-        page = BlocProvider(
-          create: (context) => AuthCubit(),
+        page = MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) => AuthCubit(),
+            ),
+            BlocProvider(
+              create: (context) => UserCubit(),
+            ),
+          ],
           child: const MyWidgetTree(),
         );
         break;

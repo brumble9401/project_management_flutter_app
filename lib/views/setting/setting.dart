@@ -41,7 +41,7 @@ class _MySettingPageState extends State<MySettingPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Notification",
+                "Setting",
                 style: TextStyle(
                   color: neutral_dark,
                   fontWeight: FontWeight.bold,
