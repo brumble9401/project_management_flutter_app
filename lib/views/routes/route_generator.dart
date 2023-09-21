@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:pma_dclv/view-model/authentication/auth_cubit.dart';
 import 'package:pma_dclv/view-model/chat/chat_cubit.dart';
 import 'package:pma_dclv/view-model/comment/comment_cubit.dart';
 import 'package:pma_dclv/view-model/files_upload/file_cubit.dart';
@@ -7,8 +9,10 @@ import 'package:pma_dclv/view-model/projects/project_cubit.dart';
 import 'package:pma_dclv/view-model/tasks/task_cubit.dart';
 import 'package:pma_dclv/view-model/user/user_cubit.dart';
 import 'package:pma_dclv/view-model/workspace/workspace_cubit.dart';
-import 'package:pma_dclv/views/dashboard/add_users/add_user.dart';
+import 'package:pma_dclv/views/authentication/signin.dart';
+import 'package:pma_dclv/views/authentication/signup.dart';
 import 'package:pma_dclv/views/chatting/chat_room.dart';
+import 'package:pma_dclv/views/dashboard/add_users/add_user.dart';
 import 'package:pma_dclv/views/dashboard/add_users/members.dart';
 import 'package:pma_dclv/views/dashboard/projects/project.dart';
 import 'package:pma_dclv/views/dashboard/projects/project_detail.dart';
@@ -17,14 +21,12 @@ import 'package:pma_dclv/views/dashboard/tasks/tasks.dart';
 import 'package:pma_dclv/views/home.dart';
 import 'package:pma_dclv/views/onBoarding.dart';
 import 'package:pma_dclv/views/routes/route_name.dart';
-import 'package:pma_dclv/views/authentication/signin.dart';
-import 'package:pma_dclv/views/authentication/signup.dart';
 import 'package:pma_dclv/views/setting/profile.dart';
+import 'package:pma_dclv/views/setting/workspace/workspace_detail.dart';
+import 'package:pma_dclv/views/setting/workspace/workspace_list.dart';
+import 'package:pma_dclv/views/setting/workspace/workspace_member.dart';
 import 'package:pma_dclv/views/widget_tree.dart';
 import 'package:pma_dclv/views/widgets/text_editing/text_editing_page.dart';
-import 'package:flutter_quill/flutter_quill.dart' as quill;
-
-import '../../view-model/authentication/auth_cubit.dart';
 
 class RouteGenerator {
   static Route<dynamic>? onGenerateAppRoute(RouteSettings settings) {
@@ -83,7 +85,9 @@ class RouteGenerator {
         final String workspaceUid = settings.arguments as String;
         page = BlocProvider(
           create: (context) => ProjectCubit(),
-          child: MyProjectView(workspaceUid: workspaceUid,),
+          child: MyProjectView(
+            workspaceUid: workspaceUid,
+          ),
         );
         break;
 
@@ -91,7 +95,9 @@ class RouteGenerator {
         final String workspaceUid = settings.arguments as String;
         page = BlocProvider(
           create: (context) => TaskCubit(),
-          child: MyTaskView(workspaceUid: workspaceUid,),
+          child: MyTaskView(
+            workspaceUid: workspaceUid,
+          ),
         );
         break;
 
@@ -215,7 +221,8 @@ class RouteGenerator {
 
       case RouteName.textEditing:
         final arguments = settings.arguments as Map<String, dynamic>;
-        final quill.QuillController controller = arguments['controller'] as quill.QuillController;
+        final quill.QuillController controller =
+            arguments['controller'] as quill.QuillController;
         final projectUid = arguments['projectUid'] as String;
         final String type = arguments['type'] as String;
         page = MultiBlocProvider(
@@ -227,10 +234,51 @@ class RouteGenerator {
               create: (context) => TaskCubit(),
             ),
           ],
-          child: TextEditingPage(controller: controller, projectUid: projectUid, type: type,),
+          child: TextEditingPage(
+            controller: controller,
+            projectUid: projectUid,
+            type: type,
+          ),
         );
         break;
 
+      case RouteName.workspaceList:
+        page = MultiBlocProvider(
+          providers: [
+            BlocProvider(create: (context) => WorkspaceCubit()),
+            BlocProvider(create: (context) => UserCubit()),
+          ],
+          child: const WorkspaceListPage(),
+        );
+        break;
+
+      case RouteName.workspaceDetail:
+        final String workspaceUid = settings.arguments as String;
+        page = MultiBlocProvider(
+          providers: [
+            BlocProvider(create: (context) => WorkspaceCubit()),
+            BlocProvider(create: (context) => UserCubit()),
+          ],
+          child: WorkspaceDetail(workspaceUid: workspaceUid),
+        );
+        break;
+
+      case RouteName.workspaceMember:
+        final arguments = settings.arguments as Map<String, dynamic>;
+        final String workspaceUid = arguments['workspaceUid'] as String;
+        final List<String> workspaceLeaderUid =
+            arguments['workspaceLeaderUid'] as List<String>;
+        page = MultiBlocProvider(
+          providers: [
+            BlocProvider(create: (context) => WorkspaceCubit()),
+            BlocProvider(create: (context) => UserCubit()),
+          ],
+          child: MyWorkspaceMemberPage(
+            workspaceUid: workspaceUid,
+            workspaceLeaderUid: workspaceLeaderUid,
+          ),
+        );
+        break;
     }
 
     return _getPageRoute(page, settings);

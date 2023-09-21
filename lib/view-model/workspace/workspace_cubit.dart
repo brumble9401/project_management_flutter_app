@@ -64,4 +64,66 @@ class WorkspaceCubit extends Cubit<WorkspaceState> {
       'workspace_id': FieldValue.arrayUnion([workspaceUid])
     });
   }
+
+  Future<void> deleteUserFromWorkspace(
+    String workspaceUid,
+    String userUid,
+  ) async {
+    try {
+      emit(state.copyWith(workspaceStatus: WorkspaceStatus.loading));
+
+      final FirebaseFirestore documentReference = FirebaseFirestore.instance;
+      await documentReference
+          .collection('workspaces')
+          .doc(workspaceUid)
+          .update({
+        'users_id': FieldValue.arrayRemove([userUid])
+      }).then(
+        (value) async {
+          final DocumentSnapshot workspaceSnap = await FirebaseFirestore
+              .instance
+              .collection('users')
+              .doc(userUid)
+              .get();
+          final List<dynamic> workspaceList = workspaceSnap.get('workspace_id');
+          workspaceList.remove(workspaceUid);
+
+          await documentReference.collection('users').doc(userUid).update({
+            'workspace_id': FieldValue.arrayRemove([workspaceUid])
+          });
+        },
+      );
+
+      emit(state.copyWith(workspaceStatus: WorkspaceStatus.success));
+      LogUtil.info("Delete user from workspace successfully: ");
+      emit(state.copyWith(workspaceStatus: WorkspaceStatus.initial));
+    } catch (e) {
+      emit(state.copyWith(workspaceStatus: WorkspaceStatus.fail));
+      LogUtil.error("Delete user from workspace error: ", error: e);
+      emit(state.copyWith(workspaceStatus: WorkspaceStatus.initial));
+    }
+  }
+
+  Future<void> updateLeaderInWorkspace(
+    String workspaceUid,
+    String userUid,
+  ) async {
+    try {
+      emit(state.copyWith(workspaceStatus: WorkspaceStatus.loading));
+
+      FirebaseFirestore.instance
+          .collection('workspaces')
+          .doc(workspaceUid)
+          .update({
+        'leaders_id': FieldValue.arrayUnion([userUid])
+      });
+
+      emit(state.copyWith(workspaceStatus: WorkspaceStatus.success));
+      LogUtil.info("Promote leader in workspace successfully: ");
+    } catch (e) {
+      emit(state.copyWith(workspaceStatus: WorkspaceStatus.fail));
+      LogUtil.error("Promote leader in workspace error: ", error: e);
+      emit(state.copyWith(workspaceStatus: WorkspaceStatus.initial));
+    }
+  }
 }

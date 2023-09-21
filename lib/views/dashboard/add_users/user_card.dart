@@ -41,8 +41,7 @@ class UserBox extends StatelessWidget {
                 backgroundImage: user.avatar != ''
                     ? NetworkImage(user.avatar.toString())
                     : const NetworkImage(
-                    'https://img.myloview.com/posters/default-avatar-profile-icon-vector-social-media-user-photo-400-205577532.jpg'
-                ),
+                        'https://img.myloview.com/posters/default-avatar-profile-icon-vector-social-media-user-photo-400-205577532.jpg'),
                 backgroundColor: Colors.transparent,
               ),
             ),

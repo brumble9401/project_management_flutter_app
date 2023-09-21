@@ -15,4 +15,8 @@ class RouteName {
   static const profile = "/profile";
 
   static const textEditing = 'text_editing';
+
+  static const workspaceList = 'workspace_list';
+  static const workspaceDetail = 'workspace_detail';
+  static const workspaceMember = 'workspace_member';
 }

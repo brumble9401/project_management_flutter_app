@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pma_dclv/data/config/hive_config.dart';
+import 'package:pma_dclv/theme/theme.dart';
 import 'package:pma_dclv/utils/Notification_Services.dart';
 import 'package:pma_dclv/utils/local_notification_service.dart';
 import 'package:pma_dclv/view-model/authentication/auth_cubit.dart';
 import 'package:pma_dclv/views/routes/route_generator.dart';
 import 'package:pma_dclv/views/routes/route_name.dart';
-import 'package:pma_dclv/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 @pragma('vm:entry-point')
@@ -57,7 +57,7 @@ class MyApp extends StatelessWidget {
             BlocProvider(create: (context) => AuthCubit()),
           ],
           child: MaterialApp(
-            title: 'Flutter Demo',
+            title: 'Project Management Application',
             theme: ThemeData(
               primarySwatch: Kprimary,
             ),

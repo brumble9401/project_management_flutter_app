@@ -7,6 +7,7 @@ import 'package:pma_dclv/main.dart';
 import 'package:pma_dclv/theme/theme.dart';
 import 'package:pma_dclv/view-model/user/user_cubit.dart';
 import 'package:pma_dclv/view-model/workspace/workspace_cubit.dart';
+import 'package:pma_dclv/views/routes/route_name.dart';
 import 'package:pma_dclv/views/widgets/button/button.dart';
 import 'package:pma_dclv/views/widgets/button/text_icon_button.dart';
 import 'package:pma_dclv/views/widgets/card/workspace_card.dart';
@@ -93,7 +94,8 @@ class _MySettingPageState extends State<MySettingPage> {
                           icon: Icons.change_circle_outlined,
                           text: "Change",
                           onPressed: () {
-                            print("Change");
+                            Navigator.pushNamed(
+                                context, RouteName.workspaceList);
                           },
                         ),
                       ],
@@ -123,7 +125,12 @@ class _MySettingPageState extends State<MySettingPage> {
               BlocConsumer<AuthCubit, AuthState>(
                 listener: (context, state) {
                   if (state.authStatus == AuthStatus.success) {
-                    Navigator.pushReplacement( context, MaterialPageRoute(builder: (context) => MyApp(initialRoot: '',)));
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => MyApp(
+                                  initialRoot: '',
+                                )));
                   }
                 },
                 builder: (context, state) {

@@ -113,22 +113,23 @@ class _WorkspaceCreateState extends State<WorkspaceCreate> {
                         listener: (context, state) async {
                       if (state.workspaceStatus == WorkspaceStatus.success) {
                         await QuickAlert.show(
-                            context: context,
-                            type: QuickAlertType.success,
-                            text: 'Create workspace Completed Successfully!',
-                            confirmBtnText: 'Yes',
-                            confirmBtnColor: primary,
-                            onConfirmBtnTap: () {
-                              context
-                                  .read<WorkspaceCubit>()
-                                  .updateWorkspaceUidFromUser(
-                                      widget.userUid, newWorkspaceUid);
-                              Navigator.pushNamedAndRemoveUntil(
-                                context,
-                                RouteName.initialRoot,
-                                (route) => false,
-                              );
-                            });
+                          context: context,
+                          type: QuickAlertType.success,
+                          text: 'Create workspace Completed Successfully!',
+                          confirmBtnText: 'Yes',
+                          confirmBtnColor: semantic_green,
+                          onConfirmBtnTap: () {
+                            context
+                                .read<WorkspaceCubit>()
+                                .updateWorkspaceUidFromUser(
+                                    widget.userUid, newWorkspaceUid);
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              RouteName.initialRoot,
+                              (route) => false,
+                            );
+                          },
+                        );
                       } else if (state.workspaceStatus ==
                           WorkspaceStatus.fail) {
                         await QuickAlert.show(
