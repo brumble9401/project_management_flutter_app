@@ -8,7 +8,12 @@ import 'package:pma_dclv/views/dashboard/add_users/user_card.dart';
 import 'package:pma_dclv/views/routes/route_name.dart';
 
 class MyMemberPage extends StatefulWidget {
-  const MyMemberPage({super.key, required this.uids, required this.projectUid, required this.workspaceUid, required this.type});
+  const MyMemberPage(
+      {super.key,
+      required this.uids,
+      required this.projectUid,
+      required this.workspaceUid,
+      required this.type});
 
   final List<String> uids;
   final String projectUid;
@@ -56,16 +61,26 @@ class _MyMemberPageState extends State<MyMemberPage> {
                       fontSize: 20.sp,
                     ),
                   ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, RouteName.add_user, arguments: {
-                          'uids': [widget.workspaceUid, widget.projectUid],
-                          'type': widget.type,
-                        },
-                      );
-                    },
-                    child: const Text("Add"),
-                  )
+                  widget.type == 'projects'
+                      ? TextButton(
+                          onPressed: () {
+                            Navigator.pushNamed(
+                              context,
+                              RouteName.add_user,
+                              arguments: {
+                                'uids': [
+                                  widget.workspaceUid,
+                                  widget.projectUid
+                                ],
+                                'type': widget.type,
+                              },
+                            );
+                          },
+                          child: const Text("Add"),
+                        )
+                      : Container(
+                          width: 40.w,
+                        ),
                 ],
               ),
             ),
@@ -76,7 +91,7 @@ class _MyMemberPageState extends State<MyMemberPage> {
               // child: ListView.builder(),
               child: StreamBuilder<List<UserModel>>(
                 stream:
-                    context.read<UserCubit>().getListofUserFromUid(widget.uids),
+                    context.read<UserCubit>().getListOfUserFromUid(widget.uids),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     List<UserModel> users = snapshot.data!;

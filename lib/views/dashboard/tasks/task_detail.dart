@@ -2,27 +2,26 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:pma_dclv/data/models/comment/comment_model.dart';
 import 'package:pma_dclv/data/models/task/task_model.dart';
+import 'package:pma_dclv/theme/theme.dart';
 import 'package:pma_dclv/view-model/comment/comment_cubit.dart';
+import 'package:pma_dclv/view-model/files_upload/file_cubit.dart';
 import 'package:pma_dclv/view-model/tasks/task_cubit.dart';
 import 'package:pma_dclv/views/routes/route_name.dart';
-import 'package:pma_dclv/views/widgets/card/images_add_card.dart';
-
-import 'package:pma_dclv/theme/theme.dart';
-import 'package:pma_dclv/view-model/files_upload/file_cubit.dart';
 import 'package:pma_dclv/views/widgets/appbar/non_title_appbar.dart';
 import 'package:pma_dclv/views/widgets/card/comment_card.dart';
 import 'package:pma_dclv/views/widgets/card/file_card.dart';
+import 'package:pma_dclv/views/widgets/card/images_add_card.dart';
 import 'package:pma_dclv/views/widgets/comment_box.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter_quill/flutter_quill.dart' as quill;
 
 enum _MenuValues {
   addUser,
@@ -105,7 +104,8 @@ class _MyTaskDetailState extends State<MyTaskDetail> {
         if (snapshot.hasData) {
           task = snapshot.data!;
 
-          List<dynamic> initialContentMap = jsonDecode(task.description.toString());
+          List<dynamic> initialContentMap =
+              jsonDecode(task.description.toString());
           _quillController = quill.QuillController(
             document: quill.Document.fromJson(initialContentMap),
             selection: const TextSelection.collapsed(offset: 0),
@@ -151,20 +151,27 @@ class _MyTaskDetailState extends State<MyTaskDetail> {
                               child: Text('Delete project'),
                             ),
                           ],
-                          icon: Icon(FontAwesomeIcons.plus, color: white, size: 15.sp,),
+                          icon: Icon(
+                            FontAwesomeIcons.plus,
+                            color: white,
+                            size: 15.sp,
+                          ),
                           onSelected: (value) {
                             switch (value) {
                               case _MenuValues.addUser:
                                 Navigator.pushNamed(context, RouteName.add_user,
-                                    arguments: {'uids':[task.workspaceId, task.id], 'type': 'tasks'});
+                                    arguments: {
+                                      'uids': [task.projectUid, task.id],
+                                      'type': 'tasks'
+                                    });
                                 break;
 
                               case _MenuValues.markDone:
-                                context.read<TaskCubit>().updateTaskState(task.id.toString(), 'finished');
+                                context.read<TaskCubit>().updateTaskState(
+                                    task.id.toString(), 'finished');
                                 break;
 
                               case _MenuValues.deleteProject:
-
                                 break;
                             }
                           },
@@ -242,7 +249,9 @@ class _MyTaskDetailState extends State<MyTaskDetail> {
                                     ),
                                     _buildDeadline(task.deadline),
                                     _buildMember(task.userIds as List<String>),
-                                    _buildDescription(_quillController.document.toPlainText().toString()),
+                                    _buildDescription(_quillController.document
+                                        .toPlainText()
+                                        .toString()),
                                     _buildImages(),
                                     SizedBox(
                                       height: 20.h,
@@ -360,11 +369,12 @@ class _MyTaskDetailState extends State<MyTaskDetail> {
               ),
               GestureDetector(
                 onTap: () {
-                  Navigator.pushNamed(context, RouteName.textEditing, arguments: {
-                    'controller': _quillController,
-                    'projectUid': widget.taskId,
-                    'type': 'tasks',
-                  });
+                  Navigator.pushNamed(context, RouteName.textEditing,
+                      arguments: {
+                        'controller': _quillController,
+                        'projectUid': widget.taskId,
+                        'type': 'tasks',
+                      });
                 },
                 child: const Icon(
                   Icons.edit_outlined,
@@ -401,7 +411,12 @@ class _MyTaskDetailState extends State<MyTaskDetail> {
           Navigator.pushNamed(
             context,
             RouteName.members,
-            arguments: {'uids':userUids, 'projectUid': task.id, 'workspaceUid': task.workspaceId, 'type': 'tasks'},
+            arguments: {
+              'uids': userUids,
+              'projectUid': task.id,
+              'workspaceUid': task.workspaceId,
+              'type': 'tasks'
+            },
           );
         },
         style: ButtonStyle(

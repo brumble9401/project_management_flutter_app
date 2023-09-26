@@ -163,6 +163,21 @@ class WorkspaceCubit extends Cubit<WorkspaceState> {
         batch.delete(taskRef);
       }
 
+      // 4. Update user documents to remove the workspace reference
+      final usersQuery = FirebaseFirestore.instance.collection('users');
+      final userDocs = await usersQuery.get();
+      for (final userDoc in userDocs.docs) {
+        final userData = userDoc.data();
+        final List<String> workspaceIds =
+            List<String>.from(userData['workspace_id']);
+        if (workspaceIds.contains(workspaceUid)) {
+          workspaceIds.remove(workspaceUid);
+          final updatedUserDoc =
+              FirebaseFirestore.instance.collection('users').doc(userDoc.id);
+          batch.update(updatedUserDoc, {'workspace_id': workspaceIds});
+        }
+      }
+
       // Commit the batched write
       await batch.commit();
 

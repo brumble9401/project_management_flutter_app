@@ -45,6 +45,7 @@ class UserRemoteSource extends UserRemote {
     return controller.stream;
   }
 
+  @override
   Stream<UserModel> getUserFromUid(String userUid) {
     try {
       final DocumentReference<Map<String, dynamic>> docRef =

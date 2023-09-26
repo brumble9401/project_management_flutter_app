@@ -23,12 +23,14 @@ class _MyAddUserPageState extends State<MyAddUserPage> {
   List<String> selectedUsers = [];
 
   void addUser() async {
-    if(widget.type == 'projects') {
+    if (widget.type == 'projects') {
       await context
-        .read<ProjectCubit>()
-        .addUserToCollection(selectedUsers, widget.ids[1].toString());
-    } else if (widget.type == 'tasks'){
-      await context.read<TaskCubit>().addUser(selectedUsers, widget.ids[1].toString());
+          .read<ProjectCubit>()
+          .addUserToCollection(selectedUsers, widget.ids[1].toString());
+    } else if (widget.type == 'tasks') {
+      await context
+          .read<TaskCubit>()
+          .addUser(selectedUsers, widget.ids[1].toString());
     }
   }
 
@@ -122,73 +124,143 @@ class _MyAddUserPageState extends State<MyAddUserPage> {
                   SizedBox(
                     height: 20.h,
                   ),
-                  StreamBuilder<List<UserModel>>(
-                    stream: context
-                        .read<UserCubit>()
-                        .getUsersFromWorkspace(widget.ids[0].toString()),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        List<UserModel> users = snapshot.data!;
-                        return ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: users.length,
-                          itemBuilder: ((context, index) {
-                            if (name.isEmpty) {
-                              return Padding(
-                                padding: EdgeInsets.only(top: 10.h),
-                                child: UserBox(
-                                  user: users[index],
-                                  isSelected: selectedUsers
-                                      .contains(users[index].id.toString()),
-                                  onTap: () {
-                                    setState(() {
-                                      if (selectedUsers.contains(
-                                          users[index].id.toString())) {
-                                        selectedUsers
-                                            .remove(users[index].id.toString());
-                                      } else {
-                                        selectedUsers
-                                            .add(users[index].id.toString());
-                                      }
-                                    });
-                                  },
-                                ),
-                              );
-                            } else if (users[index]
-                                .firstName
-                                .toString()
-                                .toLowerCase()
-                                .startsWith(name.toLowerCase())) {
-                              return Padding(
-                                padding: EdgeInsets.only(top: 10.h),
-                                child: UserBox(
-                                  user: users[index],
-                                  isSelected: selectedUsers
-                                      .contains(users[index].id.toString()),
-                                  onTap: () {
-                                    setState(() {
-                                      if (selectedUsers.contains(
-                                          users[index].id.toString())) {
-                                        selectedUsers
-                                            .remove(users[index].id.toString());
-                                      } else {
-                                        selectedUsers
-                                            .add(users[index].id.toString());
-                                      }
-                                    });
-                                  },
-                                ),
+                  widget.type == 'projects'
+                      ? StreamBuilder<List<UserModel>>(
+                          stream: context
+                              .read<UserCubit>()
+                              .getUsersFromWorkspace(widget.ids[0].toString()),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              List<UserModel> users = snapshot.data!;
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: users.length,
+                                itemBuilder: ((context, index) {
+                                  if (name.isEmpty) {
+                                    return Padding(
+                                      padding: EdgeInsets.only(top: 10.h),
+                                      child: UserBox(
+                                        user: users[index],
+                                        isSelected: selectedUsers.contains(
+                                            users[index].id.toString()),
+                                        onTap: () {
+                                          setState(() {
+                                            if (selectedUsers.contains(
+                                                users[index].id.toString())) {
+                                              selectedUsers.remove(
+                                                  users[index].id.toString());
+                                            } else {
+                                              selectedUsers.add(
+                                                  users[index].id.toString());
+                                            }
+                                          });
+                                        },
+                                      ),
+                                    );
+                                  } else if (users[index]
+                                      .firstName
+                                      .toString()
+                                      .toLowerCase()
+                                      .startsWith(name.toLowerCase())) {
+                                    return Padding(
+                                      padding: EdgeInsets.only(top: 10.h),
+                                      child: UserBox(
+                                        user: users[index],
+                                        isSelected: selectedUsers.contains(
+                                            users[index].id.toString()),
+                                        onTap: () {
+                                          setState(() {
+                                            if (selectedUsers.contains(
+                                                users[index].id.toString())) {
+                                              selectedUsers.remove(
+                                                  users[index].id.toString());
+                                            } else {
+                                              selectedUsers.add(
+                                                  users[index].id.toString());
+                                            }
+                                          });
+                                        },
+                                      ),
+                                    );
+                                  } else {
+                                    return Container();
+                                  }
+                                }),
                               );
                             } else {
-                              return Container();
+                              return const Center(
+                                  child: CircularProgressIndicator());
                             }
-                          }),
-                        );
-                      } else {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                    },
-                  ),
+                          },
+                        )
+                      : StreamBuilder<List<UserModel>>(
+                          stream: context
+                              .read<UserCubit>()
+                              .getUsersFromProject(widget.ids[0].toString()),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              List<UserModel> users = snapshot.data!;
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: users.length,
+                                itemBuilder: ((context, index) {
+                                  if (name.isEmpty) {
+                                    return Padding(
+                                      padding: EdgeInsets.only(top: 10.h),
+                                      child: UserBox(
+                                        user: users[index],
+                                        isSelected: selectedUsers.contains(
+                                            users[index].id.toString()),
+                                        onTap: () {
+                                          setState(() {
+                                            if (selectedUsers.contains(
+                                                users[index].id.toString())) {
+                                              selectedUsers.remove(
+                                                  users[index].id.toString());
+                                            } else {
+                                              selectedUsers.add(
+                                                  users[index].id.toString());
+                                            }
+                                          });
+                                        },
+                                      ),
+                                    );
+                                  } else if (users[index]
+                                      .firstName
+                                      .toString()
+                                      .toLowerCase()
+                                      .startsWith(name.toLowerCase())) {
+                                    return Padding(
+                                      padding: EdgeInsets.only(top: 10.h),
+                                      child: UserBox(
+                                        user: users[index],
+                                        isSelected: selectedUsers.contains(
+                                            users[index].id.toString()),
+                                        onTap: () {
+                                          setState(() {
+                                            if (selectedUsers.contains(
+                                                users[index].id.toString())) {
+                                              selectedUsers.remove(
+                                                  users[index].id.toString());
+                                            } else {
+                                              selectedUsers.add(
+                                                  users[index].id.toString());
+                                            }
+                                          });
+                                        },
+                                      ),
+                                    );
+                                  } else {
+                                    return Container();
+                                  }
+                                }),
+                              );
+                            } else {
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            }
+                          },
+                        ),
                 ],
               ),
             ),

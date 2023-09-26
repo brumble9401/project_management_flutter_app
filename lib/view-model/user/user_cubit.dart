@@ -3,7 +3,6 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pma_dclv/data/repositories/user_repository.dart';
 import 'package:pma_dclv/utils/Notification_Services.dart';
-import 'package:pma_dclv/utils/user_adapter.dart';
 
 import '../../data/models/user/user_model.dart';
 import '../../utils/log_util.dart';
@@ -26,6 +25,46 @@ class UserCubit extends Cubit<UserState> {
     }
   }
 
+  Stream<List<UserModel>> getUsersFromProject(String projectUid) async* {
+    try {
+      emit(state.copyWith(userStatus: UserStatus.loading));
+
+      final projectDocument = await FirebaseFirestore.instance
+          .collection('projects')
+          .doc(projectUid)
+          .get();
+
+      if (projectDocument.exists) {
+        final List<String> userUids =
+            List<String>.from(projectDocument['users_id']);
+        final List<UserModel> users = [];
+
+        for (final uid in userUids) {
+          final userDocument = await FirebaseFirestore.instance
+              .collection('users')
+              .doc(uid)
+              .get();
+
+          if (userDocument.exists) {
+            final user = UserModel.fromDocument(userDocument);
+            users.add(user);
+          }
+        }
+
+        emit(state.copyWith(userStatus: UserStatus.success));
+
+        yield users;
+      } else {
+        emit(state.copyWith(userStatus: UserStatus.fail));
+        LogUtil.error("Project document does not exist");
+        yield []; // Return an empty list if the project document does not exist
+      }
+    } catch (e) {
+      LogUtil.error("Fetch users error: ", error: e);
+      yield []; // Return an empty list in case of an error
+    }
+  }
+
   Stream<UserModel> getUserFromUid(String userUid) async* {
     try {
       emit(state.copyWith(userStatus: UserStatus.loading));
@@ -37,7 +76,7 @@ class UserCubit extends Cubit<UserState> {
     }
   }
 
-  Stream<List<UserModel>> getListofUserFromUid(List<String> userUids) async* {
+  Stream<List<UserModel>> getListOfUserFromUid(List<String> userUids) async* {
     List<UserModel> users = [];
     try {
       for (String uid in userUids) {
