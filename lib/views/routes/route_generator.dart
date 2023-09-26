@@ -21,6 +21,7 @@ import 'package:pma_dclv/views/dashboard/tasks/tasks.dart';
 import 'package:pma_dclv/views/home.dart';
 import 'package:pma_dclv/views/onBoarding.dart';
 import 'package:pma_dclv/views/routes/route_name.dart';
+import 'package:pma_dclv/views/setting/change_password.dart';
 import 'package:pma_dclv/views/setting/profile.dart';
 import 'package:pma_dclv/views/setting/workspace/workspace_detail.dart';
 import 'package:pma_dclv/views/setting/workspace/workspace_list.dart';
@@ -297,6 +298,13 @@ class RouteGenerator {
             workspaceUid: workspaceUid,
             workspaceLeaderUid: workspaceLeaderUid,
           ),
+        );
+        break;
+
+      case RouteName.changePassword:
+        page = BlocProvider(
+          create: (context) => AuthCubit(),
+          child: ChangePasswordPage(),
         );
         break;
     }

@@ -96,4 +96,25 @@ class AuthCubit extends Cubit<AuthState> {
     LogUtil.info("Logout successfully");
     emit(state.copyWith(authStatus: AuthStatus.success));
   }
+
+  Future<void> changePassword(
+      String email, String password, String newPassword) async {
+    try {
+      emit(state.copyWith(authStatus: AuthStatus.loading));
+      final user = FirebaseAuth.instance.currentUser;
+      final credential = EmailAuthProvider.credential(
+        email: email,
+        password: password,
+      );
+
+      await user?.reauthenticateWithCredential(credential);
+
+      // Password is verified; change to the new password.
+      await user?.updatePassword(newPassword);
+
+      emit(state.copyWith(authStatus: AuthStatus.success));
+    } catch (e) {
+      // Handle errors, such as incorrect old password.
+    }
+  }
 }

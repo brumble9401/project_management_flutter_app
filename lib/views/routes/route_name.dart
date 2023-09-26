@@ -19,4 +19,6 @@ class RouteName {
   static const workspaceList = 'workspace_list';
   static const workspaceDetail = 'workspace_detail';
   static const workspaceMember = 'workspace_member';
+
+  static const changePassword = 'change_password';
 }

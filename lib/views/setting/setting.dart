@@ -171,28 +171,41 @@ class _MySettingPageState extends State<MySettingPage> {
                   ),
                 ],
               ),
-              BlocConsumer<AuthCubit, AuthState>(
-                listener: (context, state) {
-                  if (state.authStatus == AuthStatus.success) {
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const MyApp(
-                                  initialRoot: '',
-                                )));
-                  }
-                },
-                builder: (context, state) {
-                  if (state.authStatus == AuthStatus.loading) {
-                    return const CircularProgressIndicator();
-                  }
-                  return Button(
-                    onPressed: () async {
-                      await context.read<AuthCubit>().firebaseSignOut();
+              Column(
+                children: [
+                  Button(
+                    onPressed: () {
+                      Navigator.pushNamed(context, RouteName.changePassword);
                     },
-                    title: "Sign out",
-                  );
-                },
+                    title: 'Change Password',
+                  ),
+                  SizedBox(
+                    height: 10.h,
+                  ),
+                  BlocConsumer<AuthCubit, AuthState>(
+                    listener: (context, state) {
+                      if (state.authStatus == AuthStatus.success) {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const MyApp(
+                                      initialRoot: '',
+                                    )));
+                      }
+                    },
+                    builder: (context, state) {
+                      if (state.authStatus == AuthStatus.loading) {
+                        return const CircularProgressIndicator();
+                      }
+                      return Button(
+                        onPressed: () async {
+                          await context.read<AuthCubit>().firebaseSignOut();
+                        },
+                        title: "Sign out",
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),

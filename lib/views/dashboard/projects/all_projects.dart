@@ -75,7 +75,7 @@ class _MyAllProjectsState extends State<MyAllProjects> {
                                           );
                                     },
                                     elevation: 2.0,
-                                    fillColor: semantic_green,
+                                    fillColor: primary,
                                     padding: EdgeInsets.all(15.sp),
                                     shape: const CircleBorder(),
                                     child: Icon(

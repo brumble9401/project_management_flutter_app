@@ -33,7 +33,6 @@ import 'package:pma_dclv/views/widgets/comment_box.dart';
 enum _MenuValues {
   addUser,
   markDone,
-  deleteProject,
 }
 
 class MyProjectDetail extends StatefulWidget {
@@ -168,10 +167,6 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
                                     value: _MenuValues.markDone,
                                     child: Text('Mark done'),
                                   ),
-                                  const PopupMenuItem(
-                                    value: _MenuValues.deleteProject,
-                                    child: Text('Delete project'),
-                                  ),
                                 ],
                                 icon: Icon(
                                   FontAwesomeIcons.plus,
@@ -197,18 +192,6 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
                                           .read<ProjectCubit>()
                                           .updateProjectStatus(
                                               widget.project_id, 'finished');
-                                      break;
-
-                                    case _MenuValues.deleteProject:
-                                      context
-                                          .read<ProjectCubit>()
-                                          .deleteProject(widget.project_id)
-                                          .then((_) {
-                                        Navigator.pop(context);
-                                      }).catchError((error) {
-                                        // Handle any errors here, if needed
-                                        print("Error deleting project: $error");
-                                      });
                                       break;
                                   }
                                 },
