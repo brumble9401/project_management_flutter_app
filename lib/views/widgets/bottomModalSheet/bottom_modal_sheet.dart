@@ -4,22 +4,24 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:pma_dclv/theme/theme.dart';
 import 'package:pma_dclv/view-model/tasks/task_cubit.dart';
 import 'package:pma_dclv/view-model/user/user_cubit.dart';
 import 'package:pma_dclv/views/routes/route_name.dart';
 import 'package:pma_dclv/views/widgets/button/button.dart';
-import 'package:flutter_quill/flutter_quill.dart' as quill;
-
-import 'package:pma_dclv/theme/theme.dart';
 import 'package:pma_dclv/views/widgets/button/iconButton.dart';
 import 'package:pma_dclv/views/widgets/inputBox.dart';
 
 class MyBottomModalSheet extends StatefulWidget {
   const MyBottomModalSheet(
-      {super.key, required this.title, required this.projectId, required this.workspaceId});
+      {super.key,
+      required this.title,
+      required this.projectId,
+      required this.workspaceId});
 
   final String projectId;
   final String title;
@@ -31,7 +33,8 @@ class MyBottomModalSheet extends StatefulWidget {
 
 class _MyBottomModalSheetState extends State<MyBottomModalSheet> {
   final TextEditingController _nameController = TextEditingController();
-  final quill.QuillController _descriptionController = quill.QuillController.basic();
+  final quill.QuillController _descriptionController =
+      quill.QuillController.basic();
   DateTime deadline = DateTime.now();
   String user_uid = FirebaseAuth.instance.currentUser!.uid.toString();
   String task_uid = "";
@@ -48,7 +51,8 @@ class _MyBottomModalSheetState extends State<MyBottomModalSheet> {
     //     DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(deadline);
     Map<String, dynamic> task = {
       "task_name": _nameController.text,
-      "description": jsonEncode(_descriptionController.document.toDelta().toJson()),
+      "description":
+          jsonEncode(_descriptionController.document.toDelta().toJson()),
       // "deadline": DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(deadline),
       "deadline": Timestamp.fromDate(deadline),
       "users_id": [
@@ -65,7 +69,6 @@ class _MyBottomModalSheetState extends State<MyBottomModalSheet> {
 
   @override
   Widget build(BuildContext context) {
-    print(deadline);
     final screenHeight = MediaQuery.of(context).size.height;
     return Container(
       decoration: BoxDecoration(
@@ -232,22 +235,29 @@ class _MyBottomModalSheetState extends State<MyBottomModalSheet> {
                   SizedBox(
                     height: 10.h,
                   ),
-                  _descriptionController.getPlainText().isEmpty ? IconBtn(
-                    onPressed: () {
-                      Navigator.pushNamed(context, RouteName.textEditing, arguments: {'controller':_descriptionController, 'projectUid':'', 'type': ''});
-                      print("a");
-                      },
-                    icon: Icon(
-                      FontAwesomeIcons.add,
-                      color: white,
-                      size: 14.sp,
-                    ),
-                  ) : Text(
-                    _descriptionController.getPlainText(),
-                    style: const TextStyle(
-                      color: neutral_dark,
-                    ),
-                  )
+                  _descriptionController.getPlainText().isEmpty
+                      ? IconBtn(
+                          onPressed: () {
+                            Navigator.pushNamed(context, RouteName.textEditing,
+                                arguments: {
+                                  'controller': _descriptionController,
+                                  'projectUid': '',
+                                  'type': ''
+                                });
+                            print("a");
+                          },
+                          icon: Icon(
+                            FontAwesomeIcons.add,
+                            color: white,
+                            size: 14.sp,
+                          ),
+                        )
+                      : Text(
+                          _descriptionController.getPlainText(),
+                          style: const TextStyle(
+                            color: neutral_dark,
+                          ),
+                        )
                 ],
               ),
               Padding(

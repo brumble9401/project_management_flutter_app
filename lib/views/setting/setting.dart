@@ -11,6 +11,7 @@ import 'package:pma_dclv/views/routes/route_name.dart';
 import 'package:pma_dclv/views/widgets/button/button.dart';
 import 'package:pma_dclv/views/widgets/button/text_icon_button.dart';
 import 'package:pma_dclv/views/widgets/card/workspace_card.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../view-model/authentication/auth_cubit.dart';
 import 'user_card.dart';
@@ -24,6 +25,30 @@ class MySettingPage extends StatefulWidget {
 
 class _MySettingPageState extends State<MySettingPage> {
   final _auth = FirebaseAuth.instance;
+  String workspaceUid = "";
+  bool isLoading = false;
+
+  void getWorkspaceUid() async {
+    setState(() {
+      isLoading = true;
+    });
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? selectedWorkspaceUid = prefs.getString('selectedWorkspaceUid');
+    if (selectedWorkspaceUid != null && selectedWorkspaceUid.isNotEmpty) {
+      setState(() {
+        workspaceUid = selectedWorkspaceUid;
+      });
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getWorkspaceUid();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,19 +131,43 @@ class _MySettingPageState extends State<MySettingPage> {
                     decoration: const BoxDecoration(
                       color: white,
                     ),
-                    child: StreamBuilder<List<WorkspaceModel>>(
-                      stream: context
-                          .read<WorkspaceCubit>()
-                          .getWorkspaceFromUser(_auth.currentUser!.uid),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          final WorkspaceModel workspace = snapshot.data![0];
-                          return MyWorkspaceCard(workspace: workspace);
-                        } else {
-                          return const CircularProgressIndicator();
-                        }
-                      },
-                    ),
+                    child: isLoading == false
+                        ? StreamBuilder<WorkspaceModel>(
+                            stream: workspaceUid.isNotEmpty
+                                ? context
+                                    .read<WorkspaceCubit>()
+                                    .getWorkspaceFromUid(workspaceUid)
+                                : null,
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                final WorkspaceModel workspace = snapshot.data!;
+                                return MyWorkspaceCard(workspace: workspace);
+                              } else {
+                                return Container();
+                              }
+                            },
+                          )
+                        : Container(
+                            width: double.infinity,
+                            height: 90.h,
+                            decoration: BoxDecoration(
+                              color: white,
+                              border: Border.all(color: neutral_lightgrey),
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(20),
+                              ),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: neutral_lightgrey,
+                                  spreadRadius: 2,
+                                  blurRadius: 9,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: const Center(
+                                child: CircularProgressIndicator()),
+                          ),
                   ),
                 ],
               ),
@@ -128,7 +177,7 @@ class _MySettingPageState extends State<MySettingPage> {
                     Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => MyApp(
+                            builder: (context) => const MyApp(
                                   initialRoot: '',
                                 )));
                   }

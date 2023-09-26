@@ -9,12 +9,14 @@ class InputBox extends StatefulWidget {
     this.icon,
     this.controller,
     this.type,
+    this.validation,
   });
 
   final TextEditingController? controller;
   final String? label;
   final String? icon;
   final String? type;
+  final String? Function(String?)? validation;
 
   @override
   State<InputBox> createState() => _InputBoxState();
@@ -39,6 +41,7 @@ class _InputBoxState extends State<InputBox> {
         ],
       ),
       child: TextFormField(
+        validator: widget.validation,
         controller: widget.controller,
         obscureText: widget.type == "password" ? true : false,
         decoration: InputDecoration(

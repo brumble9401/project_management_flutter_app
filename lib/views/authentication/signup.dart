@@ -6,8 +6,9 @@ import 'package:pma_dclv/data/models/authentication/register_model.dart';
 import 'package:pma_dclv/theme/theme.dart';
 import 'package:pma_dclv/view-model/authentication/auth_cubit.dart';
 import 'package:pma_dclv/views/widgets/button/iconButton.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 
-import '../widget_tree.dart';
 import '../widgets/button/button.dart';
 import '../widgets/divider.dart';
 import '../widgets/inputBox.dart';
@@ -122,23 +123,35 @@ class _SignupScreenState extends State<SignupScreen> {
                     height: 20.h,
                   ),
                   BlocConsumer<AuthCubit, AuthState>(
-                    listener: (context, state) {
+                    listener: (context, state) async {
                       // TODO: implement listener
                       if (state.authStatus == AuthStatus.registerSuccess) {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MyWidgetTree(),
-                          ),
-                          (route) => false,
+                        // Navigator.pushAndRemoveUntil(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => const MyWidgetTree(),
+                        //   ),
+                        //   (route) => false,
+                        // );
+                        Navigator.pop(context);
+                      } else if (state.authStatus == AuthStatus.registerFail) {
+                        await QuickAlert.show(
+                          context: context,
+                          type: QuickAlertType.error,
+                          text: state.errorMessage,
                         );
                       }
                     },
                     builder: (context, state) {
                       if (state.authStatus == AuthStatus.loading) {
-                        return Button(
-                          title: "Sign Up",
-                          onPressed: () {},
+                        return const SizedBox(
+                          height: 55,
+                          child: FittedBox(
+                            child: Padding(
+                              padding: EdgeInsets.all(10),
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
                         );
                       }
                       return Button(
@@ -170,7 +183,10 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                       IconBtn(
                         onPressed: () {},
-                        icon: Icon(FontAwesomeIcons.google, size: 17.sp,),
+                        icon: Icon(
+                          FontAwesomeIcons.google,
+                          size: 17.sp,
+                        ),
                       ),
                     ],
                   ),

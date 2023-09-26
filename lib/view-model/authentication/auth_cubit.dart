@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pma_dclv/data/repositories/auth_repository.dart';
@@ -13,21 +14,32 @@ class AuthCubit extends Cubit<AuthState> {
   final _authRepository = AuthRepository.instance();
   final _auth = FirebaseAuth.instance;
 
-  Future<AuthStatus> firebaseLogin(String email, String password) async {
+  // Future<void> firebaseLogin(String email, String password) async {
+  //   try {
+  //     emit(state.copyWith(authStatus: AuthStatus.loading));
+  //     // await _authRepository.loginFirebase(email, password);
+  //     _auth.signInWithEmailAndPassword(email: email, password: password);
+  //     emit(state.copyWith(authStatus: AuthStatus.authenticated));
+  //     LogUtil.debug('Login successfully');
+  //   } on FirebaseAuthException catch (e) {
+  //     emit(state.copyWith(authStatus: AuthStatus.failed));
+  //     emit(state.copyWith(errorMessage: e.toString()));
+  //     LogUtil.error('Login error ', error: e);
+  //   }
+  // }
+
+  Future<void> firebaseLogin(String email, String password) async {
     try {
       emit(state.copyWith(authStatus: AuthStatus.loading));
-      await _authRepository.loginFirebase(email, password);
+
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+
       emit(state.copyWith(authStatus: AuthStatus.authenticated));
-
-      // final userBox = Hive.box(HiveConfig.userBox);
-      // await userBox.put('isLoggedIn', true);
-
       LogUtil.debug('Login successfully');
-      return AuthStatus.authenticated;
-    } catch (e) {
+    } on FirebaseAuthException catch (e) {
       emit(state.copyWith(authStatus: AuthStatus.failed));
-      LogUtil.error('Login error ', error: e);
-      return AuthStatus.failed;
+      emit(state.copyWith(errorMessage: e.message));
+      LogUtil.error('Login error', error: e);
     }
   }
 
@@ -52,12 +64,27 @@ class AuthCubit extends Cubit<AuthState> {
       Map<String, dynamic> obj, String email, String password) async {
     try {
       emit(state.copyWith(authStatus: AuthStatus.loading));
-      await _authRepository.registerFirebase(obj, email, password);
+      await _auth
+          .createUserWithEmailAndPassword(
+            email: email,
+            password: password,
+          )
+          .then((value) => FirebaseFirestore.instance
+              .collection('users')
+              .doc(value.user!.uid)
+              .set(obj));
+      FirebaseFirestore.instance.collection('users').add(obj);
       emit(state.copyWith(authStatus: AuthStatus.registerSuccess));
       LogUtil.debug('Register successfully');
-    } catch (e, s) {
+    } on FirebaseAuthException catch (e) {
       emit(state.copyWith(authStatus: AuthStatus.registerFail));
-      LogUtil.error('Register error ', error: e, stackTrace: s);
+      emit(state.copyWith(errorMessage: e.message));
+      if (e.code == 'weak-password') {
+        print('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        print('The account already exists for that email.');
+      }
+      LogUtil.error('Register error ', error: e);
     }
   }
 

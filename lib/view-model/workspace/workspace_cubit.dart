@@ -126,4 +126,53 @@ class WorkspaceCubit extends Cubit<WorkspaceState> {
       emit(state.copyWith(workspaceStatus: WorkspaceStatus.initial));
     }
   }
+
+  Future<String> deleteWorkspace(String workspaceUid) async {
+    try {
+      emit(state.copyWith(workspaceStatus: WorkspaceStatus.loading));
+
+      final batch = FirebaseFirestore.instance.batch();
+
+      // 1. Delete the workspace document
+      final workspaceRef =
+          FirebaseFirestore.instance.collection('workspaces').doc(workspaceUid);
+      batch.delete(workspaceRef);
+
+      // 2. Delete all projects in the same workspace
+      final projectsQuery = FirebaseFirestore.instance
+          .collection('projects')
+          .where('workspace_id', isEqualTo: workspaceUid);
+
+      final projectDocs = await projectsQuery.get();
+      for (final projectDoc in projectDocs.docs) {
+        final projectRef = FirebaseFirestore.instance
+            .collection('projects')
+            .doc(projectDoc.id);
+        batch.delete(projectRef);
+      }
+
+      // 3. Delete all tasks in the same workspace
+      final tasksQuery = FirebaseFirestore.instance
+          .collection('tasks')
+          .where('workspace_id', isEqualTo: workspaceUid);
+
+      final taskDocs = await tasksQuery.get();
+      for (final taskDoc in taskDocs.docs) {
+        final taskRef =
+            FirebaseFirestore.instance.collection('tasks').doc(taskDoc.id);
+        batch.delete(taskRef);
+      }
+
+      // Commit the batched write
+      await batch.commit();
+
+      emit(state.copyWith(workspaceStatus: WorkspaceStatus.success));
+
+      return 'success';
+    } catch (e) {
+      emit(state.copyWith(workspaceStatus: WorkspaceStatus.fail));
+      LogUtil.error("Delete workspace error: ", error: e);
+      return 'fail';
+    }
+  }
 }
