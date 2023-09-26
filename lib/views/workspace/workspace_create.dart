@@ -139,14 +139,11 @@ class _WorkspaceCreateState extends State<WorkspaceCreate> {
                         );
                       }
                     }, builder: (context, state) {
-                      if (state.workspaceStatus == WorkspaceStatus.initial) {
-                        return Button(
-                            onPressed: createWorkspace, title: "Create");
-                      } else if (state.workspaceStatus ==
-                          WorkspaceStatus.loading) {
+                      if (state.workspaceStatus == WorkspaceStatus.loading) {
                         return Button(onPressed: () {}, title: "Creating...");
                       } else {
-                        return Button(onPressed: () {}, title: "Creating...");
+                        return Button(
+                            onPressed: createWorkspace, title: "Create");
                       }
                     }),
                   ),

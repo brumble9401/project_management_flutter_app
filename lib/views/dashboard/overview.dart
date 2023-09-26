@@ -6,8 +6,8 @@ import 'package:pma_dclv/data/models/task/task_model.dart';
 import 'package:pma_dclv/theme/theme.dart';
 import 'package:pma_dclv/views/routes/route_name.dart';
 import 'package:pma_dclv/views/widgets/card/project/no_project_card.dart';
-import 'package:pma_dclv/views/widgets/card/task/no_task_card.dart';
 import 'package:pma_dclv/views/widgets/card/project_card.dart';
+import 'package:pma_dclv/views/widgets/card/task/no_task_card.dart';
 
 import '../../data/models/project/project_model.dart';
 import '../../view-model/projects/project_cubit.dart';
@@ -41,7 +41,8 @@ class _MyOverViewState extends State<MyOverView> {
       children: [
         CustomTextButton(
           onPressed: () {
-            Navigator.pushNamed(context, RouteName.projects, arguments: widget.workspaceUid.toString());
+            Navigator.pushNamed(context, RouteName.projects,
+                arguments: widget.workspaceUid.toString());
           },
           title: "Your projects",
           icon_url: "assets/icons/Project.png",
@@ -56,7 +57,12 @@ class _MyOverViewState extends State<MyOverView> {
             if (snapshot.hasData) {
               final List<ProjectModel> projectList = snapshot.data!;
               if (projectList.isNotEmpty) {
-                return MyProjectCard(project: projectList[0]);
+                return BlocProvider(
+                  create: (context) => TaskCubit(),
+                  child: MyProjectCard(
+                    project: projectList[0],
+                  ),
+                );
               } else {
                 return const NoProjectCard();
               }
@@ -72,7 +78,8 @@ class _MyOverViewState extends State<MyOverView> {
         ),
         CustomTextButton(
           onPressed: () {
-            Navigator.pushNamed(context, RouteName.tasks, arguments: widget.workspaceUid.toString());
+            Navigator.pushNamed(context, RouteName.tasks,
+                arguments: widget.workspaceUid.toString());
           },
           title: "Your tasks",
           icon_url: "assets/icons/Task.png",
@@ -88,7 +95,9 @@ class _MyOverViewState extends State<MyOverView> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 final List<TaskModel> taskList = snapshot.data!;
-                late final List<TaskModel> uncompletedTasks = taskList.where((task) => task.state == "inprogress").toList();
+                late final List<TaskModel> uncompletedTasks = taskList
+                    .where((task) => task.state == "inprogress")
+                    .toList();
                 if (uncompletedTasks.isNotEmpty) {
                   return ListView.builder(
                     shrinkWrap: true,

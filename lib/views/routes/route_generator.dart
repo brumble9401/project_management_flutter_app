@@ -91,6 +91,9 @@ class RouteGenerator {
             BlocProvider(
               create: (context) => WorkspaceCubit(),
             ),
+            BlocProvider(
+              create: (context) => TaskCubit(),
+            ),
           ],
           child: MyProjectView(
             workspaceUid: workspaceUid,
