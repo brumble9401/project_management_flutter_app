@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pma_dclv/data/models/chat/chat_room.dart';
 import 'package:pma_dclv/data/models/user/user_model.dart';
 import 'package:pma_dclv/data/models/workspaces/workspace.dart';
@@ -13,7 +12,6 @@ import 'package:pma_dclv/view-model/workspace/workspace_cubit.dart';
 import 'package:pma_dclv/views/routes/route_name.dart';
 import 'package:pma_dclv/views/widgets/appbar/default_appbar.dart';
 import 'package:pma_dclv/views/widgets/card/chat_card.dart';
-import 'package:pma_dclv/views/widgets/inputBox.dart';
 import 'package:pma_dclv/views/widgets/loading/chat_shimmer.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -45,26 +43,9 @@ class _MyChatPageState extends State<MyChatPage> {
         child: Scaffold(
           appBar: MyAppBar(
             title: "Chat",
-            btn: Container(
+            btn: SizedBox(
               width: 40.w, // Set the desired width
               height: 40.w,
-              decoration: const BoxDecoration(
-                color: primary,
-                borderRadius: BorderRadius.all(
-                  Radius.circular(
-                    10,
-                  ),
-                ),
-              ),
-              child: PopupMenuButton<_MenuValues>(
-                icon: Icon(FontAwesomeIcons.plus, color: white, size: 15.sp,),
-                itemBuilder: (BuildContext context) => [
-                  const PopupMenuItem(
-                    value: _MenuValues.createRoom,
-                    child: Text('New room'),
-                  ),
-                ],
-              ),
             ),
           ),
           body: Container(

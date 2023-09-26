@@ -88,7 +88,10 @@ class TaskCubit extends Cubit<TaskState> {
   Future<void> updateTaskState(String uid, String status) async {
     try {
       emit(state.copyWith(taskStatus: TaskStatus.loading));
-      await FirebaseFirestore.instance.collection('tasks').doc(uid).update({'state': status});
+      await FirebaseFirestore.instance
+          .collection('tasks')
+          .doc(uid)
+          .update({'state': status});
       emit(state.copyWith(taskStatus: TaskStatus.success));
       LogUtil.info("Update tasks success");
     } catch (e) {
@@ -99,7 +102,10 @@ class TaskCubit extends Cubit<TaskState> {
   Future<void> addUser(List<String> uids, String taskUid) async {
     try {
       emit(state.copyWith(taskStatus: TaskStatus.loading));
-      await FirebaseFirestore.instance.collection('tasks').doc(taskUid).update({'users_id': FieldValue.arrayUnion(uids)});
+      await FirebaseFirestore.instance
+          .collection('tasks')
+          .doc(taskUid)
+          .update({'users_id': FieldValue.arrayUnion(uids)});
       emit(state.copyWith(taskStatus: TaskStatus.success));
       LogUtil.info("Add users to task success");
     } catch (e) {
@@ -107,7 +113,8 @@ class TaskCubit extends Cubit<TaskState> {
     }
   }
 
-  Future<void> updateDescription(QuillController controller, String taskUid) async {
+  Future<void> updateDescription(
+      QuillController controller, String taskUid) async {
     try {
       await FirebaseFirestore.instance.collection('tasks').doc(taskUid).update({
         'description': jsonEncode(controller.document.toDelta().toJson()),
@@ -115,6 +122,24 @@ class TaskCubit extends Cubit<TaskState> {
       print('Text updated successfully.');
     } catch (e) {
       print('Error updating text: $e');
+    }
+  }
+
+  Future<void> deleteTask(String taskUid) async {
+    try {
+      emit(state.copyWith(taskStatus: TaskStatus.loading));
+      // Get a reference to the document you want to delete
+      final documentReference =
+          FirebaseFirestore.instance.collection('tasks').doc(taskUid);
+
+      // Delete the document
+      await documentReference.delete();
+      emit(state.copyWith(taskStatus: TaskStatus.success));
+      print('Document deleted successfully.');
+    } catch (e) {
+      emit(state.copyWith(taskStatus: TaskStatus.fail));
+      print('Error deleting document: $e');
+      emit(state.copyWith(taskStatus: TaskStatus.initial));
     }
   }
 }

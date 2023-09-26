@@ -8,6 +8,7 @@ import 'package:pma_dclv/theme/theme.dart';
 import 'package:pma_dclv/view-model/user/user_cubit.dart';
 import 'package:pma_dclv/view-model/workspace/workspace_cubit.dart';
 import 'package:pma_dclv/views/setting/workspace/user_card.dart';
+import 'package:pma_dclv/views/widgets/bottomModalSheet/add_user_to_workspace.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 
@@ -70,7 +71,30 @@ class _MyMemberPageState extends State<MyWorkspaceMemberPage> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      showModalBottomSheet(
+                        isScrollControlled: true,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(20),
+                          ),
+                        ),
+                        context: context,
+                        builder: (BuildContext context) => MultiBlocProvider(
+                          providers: [
+                            BlocProvider(
+                              create: (context) => WorkspaceCubit(),
+                            ),
+                            BlocProvider(
+                              create: (context) => UserCubit(),
+                            ),
+                          ],
+                          child: AddUserToWorkspace(
+                            workspaceUid: widget.workspaceUid,
+                          ),
+                        ),
+                      );
+                    },
                     child: const Text("Add"),
                   )
                 ],

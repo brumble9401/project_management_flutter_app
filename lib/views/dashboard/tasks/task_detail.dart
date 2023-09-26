@@ -102,6 +102,7 @@ class _MyTaskDetailState extends State<MyTaskDetail> {
       stream: context.read<TaskCubit>().getTaskFromUid(widget.taskId),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
+          final data = snapshot.data;
           task = snapshot.data!;
 
           List<dynamic> initialContentMap =
@@ -137,6 +138,10 @@ class _MyTaskDetailState extends State<MyTaskDetail> {
                           ),
                         ),
                         child: PopupMenuButton<_MenuValues>(
+                          offset: const Offset(-15, 20),
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15.w))),
                           itemBuilder: (BuildContext context) => [
                             const PopupMenuItem(
                               value: _MenuValues.addUser,
@@ -148,7 +153,7 @@ class _MyTaskDetailState extends State<MyTaskDetail> {
                             ),
                             const PopupMenuItem(
                               value: _MenuValues.deleteProject,
-                              child: Text('Delete project'),
+                              child: Text('Delete task'),
                             ),
                           ],
                           icon: Icon(
@@ -172,6 +177,10 @@ class _MyTaskDetailState extends State<MyTaskDetail> {
                                 break;
 
                               case _MenuValues.deleteProject:
+                                Navigator.pop(context);
+                                context
+                                    .read<TaskCubit>()
+                                    .deleteTask(widget.taskId);
                                 break;
                             }
                           },

@@ -10,6 +10,9 @@ import 'package:pma_dclv/data/models/user/user_model.dart';
 import 'package:pma_dclv/theme/theme.dart';
 import 'package:pma_dclv/view-model/files_upload/file_cubit.dart';
 import 'package:pma_dclv/view-model/user/user_cubit.dart';
+import 'package:pma_dclv/views/widgets/button/button.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -20,6 +23,8 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final userUid = FirebaseAuth.instance.currentUser!.uid;
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
 
   Future<void> _pickImage() async {
     final pickedFile =
@@ -61,6 +66,13 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
@@ -68,6 +80,7 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       child: SafeArea(
         child: Scaffold(
+          resizeToAvoidBottomInset: false,
           appBar: AppBar(
             automaticallyImplyLeading: false,
             titleSpacing: 0,
@@ -108,69 +121,117 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Container(
                 decoration: const BoxDecoration(color: white),
                 child: Center(
-                  child: StreamBuilder<UserModel>(
-                    stream: context.read<UserCubit>().getUserFromUid(userUid),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        UserModel user = snapshot.data!;
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Stack(
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.only(bottom: 10.h),
-                                  child: Container(
-                                    // width: 160.sp,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(color: neutral_dark),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: neutral_lightgrey,
-                                          spreadRadius: 2,
-                                          blurRadius: 9,
-                                          offset: Offset(0,
-                                              3), // changes the position of the shadow
+                  child: BlocListener<UserCubit, UserState>(
+                    listener: (context, state) async {
+                      if (state.userStatus == UserStatus.success) {
+                        await QuickAlert.show(
+                          context: context,
+                          type: QuickAlertType.success,
+                          text: 'Update Information Completed Successfully!',
+                          confirmBtnText: 'Yes',
+                          confirmBtnColor: semantic_green,
+                          onConfirmBtnTap: () {
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                          },
+                        );
+                      }
+                    },
+                    child: StreamBuilder<UserModel>(
+                      stream: context.read<UserCubit>().getUserFromUid(userUid),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          UserModel user = snapshot.data!;
+
+                          _firstNameController.text = user.firstName ?? '';
+                          _lastNameController.text = user.lastName ?? '';
+
+                          return Column(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Stack(
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              EdgeInsets.only(bottom: 10.h),
+                                          child: Container(
+                                            // width: 160.sp,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                  color: neutral_dark),
+                                              boxShadow: const [
+                                                BoxShadow(
+                                                  color: neutral_lightgrey,
+                                                  spreadRadius: 2,
+                                                  blurRadius: 9,
+                                                  offset: Offset(0,
+                                                      3), // changes the position of the shadow
+                                                ),
+                                              ],
+                                            ),
+                                            child: CircleAvatar(
+                                              radius: 70.sp,
+                                              backgroundImage: user.avatar == ''
+                                                  ? const NetworkImage(
+                                                      'https://img.myloview.com/posters/default-avatar-profile-icon-vector-social-media-user-photo-400-205577532.jpg')
+                                                  : NetworkImage(user.avatar!),
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          bottom: 4.h,
+                                          right: 10.w,
+                                          child: IconButton(
+                                            onPressed: () {
+                                              _pickImage();
+                                            },
+                                            icon: const Icon(
+                                              FontAwesomeIcons.camera,
+                                              color: neutral_lightgrey,
+                                            ),
+                                          ),
                                         ),
                                       ],
                                     ),
-                                    child: CircleAvatar(
-                                      radius: 70.sp,
-                                      backgroundImage: user.avatar == ''
-                                          ? const NetworkImage(
-                                              'https://img.myloview.com/posters/default-avatar-profile-icon-vector-social-media-user-photo-400-205577532.jpg')
-                                          : NetworkImage(user.avatar!),
+                                    SizedBox(
+                                      height: 20.h,
                                     ),
-                                  ),
+                                    itemProfile(
+                                        "First name",
+                                        "${user.firstName}",
+                                        _firstNameController),
+                                    itemProfile("Last name", "${user.lastName}",
+                                        _lastNameController),
+                                    itemProfile1("Email", "${user.email}"),
+                                  ],
                                 ),
-                                Positioned(
-                                  bottom: 4.h,
-                                  right: 10.w,
-                                  child: IconButton(
-                                    onPressed: () {
-                                      _pickImage();
-                                    },
-                                    icon: const Icon(
-                                      FontAwesomeIcons.camera,
-                                      color: neutral_lightgrey,
-                                    ),
-                                  ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(bottom: 20.h),
+                                child: Button(
+                                  onPressed: () {
+                                    context.read<UserCubit>().updateUserInfo(
+                                      userUid,
+                                      {
+                                        'last_name': _lastNameController.text,
+                                        'first_name': _firstNameController.text,
+                                      },
+                                    );
+                                  },
+                                  title: 'Update',
                                 ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 20.h,
-                            ),
-                            itemProfile("First name", "${user.firstName}"),
-                            itemProfile("Last name", "${user.lastName}"),
-                            itemProfile("Email", "${user.email}"),
-                          ],
-                        );
-                      } else {
-                        return const CircularProgressIndicator();
-                      }
-                    },
+                              ),
+                            ],
+                          );
+                        } else {
+                          return const CircularProgressIndicator();
+                        }
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -181,47 +242,99 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  itemProfile(String title, String content) {
+  itemProfile(String title, String content, TextEditingController controller) {
     return Padding(
       padding: EdgeInsets.only(top: 10.h),
       child: Container(
-          height: 50.h,
-          decoration: BoxDecoration(
-            color: white,
-            borderRadius: BorderRadius.circular(10.sp),
-            border: Border.all(color: neutral_lightgrey),
-            boxShadow: const [
-              BoxShadow(
-                color: neutral_lightgrey,
-                spreadRadius: 2,
-                blurRadius: 9,
-                offset: Offset(0, 3), // changes the position of the shadow
+        height: 50.h,
+        decoration: BoxDecoration(
+          color: white,
+          borderRadius: BorderRadius.circular(10.sp),
+          border: Border.all(color: neutral_lightgrey),
+          boxShadow: const [
+            BoxShadow(
+              color: neutral_lightgrey,
+              spreadRadius: 2,
+              blurRadius: 9,
+              offset: Offset(0, 3), // changes the position of the shadow
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: EdgeInsets.only(left: 20.w, right: 20.w),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  color: neutral_dark,
+                  fontSize: 17.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(
+                width: 170.w,
+                child: TextFormField(
+                  controller: controller,
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    color: neutral_dark,
+                  ),
+                ),
               ),
             ],
           ),
-          child: Padding(
-            padding: EdgeInsets.only(left: 20.w, right: 20.w),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: neutral_dark,
-                    fontSize: 17.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
+        ),
+      ),
+    );
+  }
+
+  itemProfile1(String title, String content) {
+    return Padding(
+      padding: EdgeInsets.only(top: 10.h),
+      child: Container(
+        height: 50.h,
+        decoration: BoxDecoration(
+          color: white,
+          borderRadius: BorderRadius.circular(10.sp),
+          border: Border.all(color: neutral_lightgrey),
+          boxShadow: const [
+            BoxShadow(
+              color: neutral_lightgrey,
+              spreadRadius: 2,
+              blurRadius: 9,
+              offset: Offset(0, 3), // changes the position of the shadow
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: EdgeInsets.only(left: 20.w, right: 20.w),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  color: neutral_dark,
+                  fontSize: 17.sp,
+                  fontWeight: FontWeight.bold,
                 ),
-                Text(
+              ),
+              SizedBox(
+                width: 170.w,
+                child: Text(
                   content,
                   style: TextStyle(
                     fontSize: 15.sp,
                     color: neutral_dark,
                   ),
                 ),
-              ],
-            ),
-          )),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

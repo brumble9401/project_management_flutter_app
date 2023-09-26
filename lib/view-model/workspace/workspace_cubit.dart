@@ -213,4 +213,56 @@ class WorkspaceCubit extends Cubit<WorkspaceState> {
       return false;
     }
   }
+
+  Future<String> addUserToWorkspace(
+      String workspaceUid, String userEmail) async {
+    try {
+      emit(state.copyWith(workspaceStatus: WorkspaceStatus.loading));
+      // Step 1: Collect the email input from the user (You should have userEmail)
+
+      // Step 2: Check if a user with that email exists
+      final userQuery = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: userEmail)
+          .get();
+
+      if (userQuery.docs.isNotEmpty) {
+        // Step 3: Retrieve the user's UID
+        final userUid = userQuery.docs.first.id;
+
+        // Step 4: Add the user's UID to the workspace document
+        await FirebaseFirestore.instance
+            .collection('workspaces')
+            .doc(workspaceUid)
+            .update({
+          'users_id': FieldValue.arrayUnion([userUid]),
+        });
+
+        // Step 5: Add the workspaceUid to the user's document
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userUid)
+            .update({
+          'workspace_id': FieldValue.arrayUnion([workspaceUid]),
+        });
+
+        emit(state.copyWith(workspaceStatus: WorkspaceStatus.success));
+        print('User added to workspace successfully.');
+        return 'success';
+      } else {
+        emit(state.copyWith(workspaceStatus: WorkspaceStatus.fail));
+        emit(state.copyWith(
+            errorMessage: 'User with email $userEmail does not exist.'));
+        print('User with email $userEmail does not exist.');
+        emit(state.copyWith(workspaceStatus: WorkspaceStatus.initial));
+        return 'wrong-email';
+      }
+    } on FirebaseException catch (e) {
+      emit(state.copyWith(workspaceStatus: WorkspaceStatus.fail));
+      emit(state.copyWith(errorMessage: e.message));
+      print('Error adding user to workspace: $e');
+      emit(state.copyWith(workspaceStatus: WorkspaceStatus.initial));
+      return e.toString();
+    }
+  }
 }

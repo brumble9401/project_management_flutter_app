@@ -103,4 +103,20 @@ class UserCubit extends Cubit<UserState> {
       print('Error Token updated : $e');
     }
   }
+
+  Future<void> updateUserInfo(String userUid, Map<String, dynamic> obj) async {
+    try {
+      emit(state.copyWith(userStatus: UserStatus.loading));
+      final String token = await NotificationServices().getToken();
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userUid)
+          .update(obj);
+      emit(state.copyWith(userStatus: UserStatus.success));
+      print('Updated successfully.');
+    } catch (e) {
+      emit(state.copyWith(userStatus: UserStatus.fail));
+      print('Updated Error: $e');
+    }
+  }
 }

@@ -88,6 +88,10 @@ class _MyProjectViewState extends State<MyProjectView> {
                         ),
                       ),
                       child: PopupMenuButton<_MenuValues>(
+                        offset: const Offset(-15, 20),
+                        shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15.w))),
                         itemBuilder: (BuildContext context) => [
                           const PopupMenuItem(
                             value: _MenuValues.createProject,

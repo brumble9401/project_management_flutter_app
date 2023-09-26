@@ -155,6 +155,10 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
                                 ),
                               ),
                               child: PopupMenuButton<_MenuValues>(
+                                offset: const Offset(-15, 20),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(15.w))),
                                 itemBuilder: (BuildContext context) => [
                                   const PopupMenuItem(
                                     value: _MenuValues.addUser,
