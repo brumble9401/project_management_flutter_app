@@ -18,10 +18,10 @@ class MyAllTasks extends StatefulWidget {
 
 class _MyAllTasksState extends State<MyAllTasks> {
   late final List<TaskModel> uncompletedTasks =
-  widget.tasks.where((task) => task.state == "inprogress").toList();
+      widget.tasks.where((task) => task.state == "inprogress").toList();
   @override
   Widget build(BuildContext context) {
-    if(uncompletedTasks.isEmpty){
+    if (uncompletedTasks.isEmpty) {
       return const NoTaskCard();
     } else {
       return GridView.builder(
@@ -44,6 +44,49 @@ class _MyAllTasksState extends State<MyAllTasks> {
                   RouteName.task_detail,
                   arguments: uncompletedTasks[index].id.toString(),
                 );
+              },
+              onLongPressed: () async {
+                final RenderBox overlay = Overlay.of(context)!
+                    .context
+                    .findRenderObject() as RenderBox;
+                // final position = RelativeRect.fromRect(
+                //   Rect.fromPoints(
+                //     Offset.zero,
+                //     Offset.zero,
+                //   ),
+                //   Offset.zero & overlay.size,
+                // );
+                // final RenderBox overlay =
+                //     context.findRenderObject() as RenderBox;
+                final position = RelativeRect.fromRect(
+                  Rect.fromPoints(
+                    overlay.localToGlobal(
+                        Offset.zero), // Get the global position of the card
+                    overlay.localToGlobal(Offset.zero), // Same as above
+                  ),
+                  Offset.zero & overlay.size,
+                );
+
+                final selectedItem = await showMenu(
+                  context: context,
+                  position: position,
+                  items: [
+                    PopupMenuItem<String>(
+                      value: 'delete',
+                      child: const Text('Delete Task'),
+                    ),
+                    PopupMenuItem<String>(
+                      value: 'markDone',
+                      child: const Text('Mark as Done'),
+                    ),
+                  ],
+                );
+
+                if (selectedItem == 'delete') {
+                  // Handle delete task action
+                } else if (selectedItem == 'markDone') {
+                  // Handle mark as done action
+                }
               },
             );
           } else if (uncompletedTasks[index]

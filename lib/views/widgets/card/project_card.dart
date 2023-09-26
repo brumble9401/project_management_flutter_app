@@ -118,48 +118,83 @@ class _MyProjectCardState extends State<MyProjectCard> {
                       .getTaskFromProjectUid(widget.project!.id.toString()),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      print(snapshot.data!);
                       final List<TaskModel> tasks = snapshot.data!;
-                      final finishTasks = tasks
-                          .where((task) => task.state == "finished")
-                          .toList();
-                      final unFinishedTasks = tasks
-                          .where((task) => task.state == "inprogress")
-                          .toList();
-                      final double percentage =
-                          finishTasks.length / tasks.length * 100;
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "${percentage.round()}%",
-                            style: TextStyle(
-                              color: neutral_dark,
-                              fontSize: 11.sp,
-                            ),
-                          ),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: SizedBox(
-                              width: 160.w,
-                              height: 5.h,
-                              child: LinearProgressIndicator(
-                                value: percentage / 100, // percent filled
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(primary),
-                                backgroundColor: neutral_lightgrey,
+                      if (tasks.length != 0) {
+                        final finishTasks = tasks
+                            .where((task) => task.state == "finished")
+                            .toList();
+                        final unFinishedTasks = tasks
+                            .where((task) => task.state == "inprogress")
+                            .toList();
+                        final double percentage =
+                            finishTasks.length / tasks.length * 100;
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "${percentage.round()}%",
+                              style: TextStyle(
+                                color: neutral_dark,
+                                fontSize: 11.sp,
                               ),
                             ),
-                          ),
-                          Text(
-                            "${finishTasks.length}/${tasks.length} tasks",
-                            style: TextStyle(
-                              color: neutral_dark,
-                              fontSize: 11.sp,
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: SizedBox(
+                                width: 160.w,
+                                height: 5.h,
+                                child: LinearProgressIndicator(
+                                  value: percentage / 100, // percent filled
+                                  valueColor:
+                                      const AlwaysStoppedAnimation<Color>(
+                                          primary),
+                                  backgroundColor: neutral_lightgrey,
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
-                      );
+                            Text(
+                              "${finishTasks.length}/${tasks.length} tasks",
+                              style: TextStyle(
+                                color: neutral_dark,
+                                fontSize: 11.sp,
+                              ),
+                            ),
+                          ],
+                        );
+                      } else {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "0%",
+                              style: TextStyle(
+                                color: neutral_dark,
+                                fontSize: 11.sp,
+                              ),
+                            ),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: SizedBox(
+                                width: 160.w,
+                                height: 5.h,
+                                child: const LinearProgressIndicator(
+                                  value: 0, // percent filled
+                                  valueColor:
+                                      AlwaysStoppedAnimation<Color>(primary),
+                                  backgroundColor: neutral_lightgrey,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              "0/0 tasks",
+                              style: TextStyle(
+                                color: neutral_dark,
+                                fontSize: 11.sp,
+                              ),
+                            ),
+                          ],
+                        );
+                      }
                     } else {
                       return Container();
                     }

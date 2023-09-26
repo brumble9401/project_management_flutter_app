@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:pma_dclv/data/models/project/project_model.dart';
 import 'package:pma_dclv/view-model/projects/project_cubit.dart';
 import 'package:pma_dclv/view-model/user/user_cubit.dart';
 import 'package:pma_dclv/view-model/workspace/workspace_cubit.dart';
@@ -12,7 +11,6 @@ import 'package:pma_dclv/views/dashboard/projects/completed_project.dart';
 import 'package:pma_dclv/views/dashboard/projects/project_tab.dart';
 import 'package:pma_dclv/views/widgets/appbar/center_title_appbar.dart';
 import 'package:pma_dclv/views/widgets/bottomModalSheet/project_create_bottom_sheet.dart';
-import 'package:pma_dclv/views/widgets/card/project/no_project_card.dart';
 
 import '../../../theme/theme.dart';
 
@@ -107,33 +105,33 @@ class _MyProjectViewState extends State<MyProjectView> {
                           switch (value) {
                             case _MenuValues.createProject:
                               showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.vertical(
-                                      top: Radius.circular(20),
-                                    ),
+                                isScrollControlled: true,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(20),
                                   ),
-                                  context: context,
-                                  builder: (BuildContext context) =>
-                                      MultiBlocProvider(
-                                        providers: [
-                                          BlocProvider(
-                                            create: (context) =>
-                                                WorkspaceCubit(),
-                                          ),
-                                          BlocProvider(
-                                            create: (context) => ProjectCubit(),
-                                          ),
-                                          BlocProvider(
-                                            create: (context) => UserCubit(),
-                                          ),
-                                        ],
-                                        child: MyProjectBottomModalSheet(
-                                          title: "Create Project",
-                                          workspaceUid:
-                                              widget.workspaceUid.toString(),
-                                        ),
-                                      ));
+                                ),
+                                context: context,
+                                builder: (BuildContext context) =>
+                                    MultiBlocProvider(
+                                  providers: [
+                                    BlocProvider(
+                                      create: (context) => WorkspaceCubit(),
+                                    ),
+                                    BlocProvider(
+                                      create: (context) => ProjectCubit(),
+                                    ),
+                                    BlocProvider(
+                                      create: (context) => UserCubit(),
+                                    ),
+                                  ],
+                                  child: MyProjectBottomModalSheet(
+                                    title: "Create Project",
+                                    workspaceUid:
+                                        widget.workspaceUid.toString(),
+                                  ),
+                                ),
+                              );
                               break;
                           }
                         },
@@ -195,37 +193,22 @@ class _MyProjectViewState extends State<MyProjectView> {
                             SizedBox(
                               height: 10.w,
                             ),
-                            StreamBuilder<List<ProjectModel>>(
-                              stream: context
-                                  .read<ProjectCubit>()
-                                  .getProjectFromWorkspaceUid(
-                                      userUid, widget.workspaceUid),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  final List<ProjectModel> projectList =
-                                      snapshot.data!;
-                                  if (projectList.isNotEmpty) {
-                                    return _page == 0
-                                        ? MyAllProjects(
-                                            projects: projectList,
-                                            name: name,
-                                            workspaceUid: widget.workspaceUid,
-                                          )
-                                        : MyCompletedProjects(
-                                            projects: projectList,
-                                            name: name,
-                                            workspaceUid: widget.workspaceUid,
-                                          );
-                                  } else {
-                                    return const NoProjectCard();
-                                  }
-                                } else if (snapshot.hasError) {
-                                  return Text('Error: ${snapshot.error}');
-                                } else {
-                                  return Container();
-                                }
-                              },
-                            ),
+                            _page == 0
+                                ? BlocProvider(
+                                    create: (context) => ProjectCubit(),
+                                    child: MyAllProjects(
+                                      isLeader: isLeader,
+                                      name: name,
+                                      workspaceUid: widget.workspaceUid,
+                                    ),
+                                  )
+                                : BlocProvider(
+                                    create: (context) => ProjectCubit(),
+                                    child: MyCompletedProjects(
+                                      name: name,
+                                      workspaceUid: widget.workspaceUid,
+                                    ),
+                                  ),
                           ],
                         ),
                       ),

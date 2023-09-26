@@ -6,10 +6,12 @@ import '../../../../data/models/task/task_model.dart';
 import '../../../../theme/theme.dart';
 
 class MyTaskCard2 extends StatefulWidget {
-  const MyTaskCard2({super.key, required this.task, this.onPressed});
+  const MyTaskCard2(
+      {super.key, required this.task, this.onPressed, this.onLongPressed});
 
   final TaskModel task;
   final Function()? onPressed;
+  final Function()? onLongPressed;
 
   @override
   State<MyTaskCard2> createState() => _MyTaskCard2State();
@@ -37,6 +39,7 @@ class _MyTaskCard2State extends State<MyTaskCard2> {
       ),
       child: OutlinedButton(
         onPressed: widget.onPressed,
+        onLongPress: widget.onLongPressed,
         style: ButtonStyle(
           padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
             EdgeInsets.zero,
@@ -73,7 +76,9 @@ class _MyTaskCard2State extends State<MyTaskCard2> {
                 ),
                 Row(
                   children: [
-                    SizedBox(width: 20.w,),
+                    SizedBox(
+                      width: 20.w,
+                    ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -92,9 +97,13 @@ class _MyTaskCard2State extends State<MyTaskCard2> {
                               height: 3.h,
                             ),
                             Text(
-                              widget.task.state == "finished" ? "Done" : "In progress",
+                              widget.task.state == "finished"
+                                  ? "Done"
+                                  : "In progress",
                               style: TextStyle(
-                                color: widget.task.state == "finished" ? semantic_green : ascent,
+                                color: widget.task.state == "finished"
+                                    ? semantic_green
+                                    : ascent,
                                 fontSize: 12.sp,
                               ),
                             ),
@@ -118,8 +127,8 @@ class _MyTaskCard2State extends State<MyTaskCard2> {
                               height: 3.h,
                             ),
                             Text(
-                              DateFormat.yMMMd().format(
-                                  DateTime.parse(widget.task.deadline.toString())),
+                              DateFormat.yMMMd().format(DateTime.parse(
+                                  widget.task.deadline.toString())),
                               style: TextStyle(
                                 color: neutral_grey,
                                 fontSize: 12.sp,
@@ -157,7 +166,6 @@ class _MyTaskCard2State extends State<MyTaskCard2> {
                     ),
                   ],
                 ),
-
               ],
             ),
           ),
