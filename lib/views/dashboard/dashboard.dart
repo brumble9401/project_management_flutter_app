@@ -32,6 +32,7 @@ class _MyDashBoardState extends State<MyDashBoard> {
   int _page = 0;
   final _auth = FirebaseAuth.instance;
   String workspaceUid = "";
+  bool isLeader = false;
 
   void onChangePage(index) {
     setState(() {
@@ -47,6 +48,8 @@ class _MyDashBoardState extends State<MyDashBoard> {
         workspaceUid = selectedWorkspaceUid;
       });
     }
+
+    checkLeader(workspaceUid);
   }
 
   @override
@@ -54,6 +57,15 @@ class _MyDashBoardState extends State<MyDashBoard> {
     super.initState();
     _loadSelectedWorkspaceUid();
     context.read<UserCubit>().updatePushToken(_auth.currentUser!.uid);
+  }
+
+  void checkLeader(String workspaceUid) async {
+    bool check = await context
+        .read<WorkspaceCubit>()
+        .checkLeader(workspaceUid, _auth.currentUser!.uid);
+    setState(() {
+      isLeader = check;
+    });
   }
 
   @override
@@ -66,63 +78,66 @@ class _MyDashBoardState extends State<MyDashBoard> {
           child: Scaffold(
             appBar: MyAppBar(
               title: "Dashboard",
-              btn: Container(
-                width: 40.w, // Set the desired width
-                height: 40.w,
-                decoration: const BoxDecoration(
-                  color: primary,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(
-                      10,
-                    ),
-                  ),
-                ),
-                child: PopupMenuButton<_MenuValues>(
-                  itemBuilder: (BuildContext context) => [
-                    const PopupMenuItem(
-                      value: _MenuValues.createProject,
-                      child: Text('New project'),
-                    ),
-                  ],
-                  icon: Icon(
-                    FontAwesomeIcons.plus,
-                    color: white,
-                    size: 15.sp,
-                  ),
-                  onSelected: (value) {
-                    switch (value) {
-                      case _MenuValues.createProject:
-                        showModalBottomSheet(
-                            isScrollControlled: true,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(20),
-                              ),
-                            ),
-                            context: context,
-                            builder: (BuildContext context) =>
-                                MultiBlocProvider(
-                                  providers: [
-                                    BlocProvider(
-                                      create: (context) => WorkspaceCubit(),
+              btn: isLeader == false
+                  ? Container()
+                  : Container(
+                      width: 40.w, // Set the desired width
+                      height: 40.w,
+                      decoration: const BoxDecoration(
+                        color: primary,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(
+                            10,
+                          ),
+                        ),
+                      ),
+                      child: PopupMenuButton<_MenuValues>(
+                        itemBuilder: (BuildContext context) => [
+                          const PopupMenuItem(
+                            value: _MenuValues.createProject,
+                            child: Text('New project'),
+                          ),
+                        ],
+                        icon: Icon(
+                          FontAwesomeIcons.plus,
+                          color: white,
+                          size: 15.sp,
+                        ),
+                        onSelected: (value) {
+                          switch (value) {
+                            case _MenuValues.createProject:
+                              showModalBottomSheet(
+                                  isScrollControlled: true,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(20),
                                     ),
-                                    BlocProvider(
-                                      create: (context) => ProjectCubit(),
-                                    ),
-                                    BlocProvider(
-                                      create: (context) => UserCubit(),
-                                    ),
-                                  ],
-                                  child: MyProjectBottomModalSheet(
-                                    title: "Create Project",
-                                    workspaceUid: workspaceUid.toString(),
                                   ),
-                                ));
-                        break;
-                    }
-                  },
-                ),
-              ),
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      MultiBlocProvider(
+                                        providers: [
+                                          BlocProvider(
+                                            create: (context) =>
+                                                WorkspaceCubit(),
+                                          ),
+                                          BlocProvider(
+                                            create: (context) => ProjectCubit(),
+                                          ),
+                                          BlocProvider(
+                                            create: (context) => UserCubit(),
+                                          ),
+                                        ],
+                                        child: MyProjectBottomModalSheet(
+                                          title: "Create Project",
+                                          workspaceUid: workspaceUid.toString(),
+                                        ),
+                                      ));
+                              break;
+                          }
+                        },
+                      ),
+                    ),
             ),
             body: Container(
               decoration: const BoxDecoration(
@@ -216,6 +231,7 @@ class _MyDashBoardState extends State<MyDashBoard> {
 
               setState(() {
                 workspaceUid = optionItem.id!;
+                checkLeader(workspaceUid);
               });
             },
           );

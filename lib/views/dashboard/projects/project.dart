@@ -31,8 +31,9 @@ class MyProjectView extends StatefulWidget {
 
 class _MyProjectViewState extends State<MyProjectView> {
   int _page = 0;
-  String user_uid = FirebaseAuth.instance.currentUser!.uid;
+  String userUid = FirebaseAuth.instance.currentUser!.uid;
   String name = "";
+  bool isLeader = false;
 
   void onChangePage(index) {
     setState(() {
@@ -40,9 +41,18 @@ class _MyProjectViewState extends State<MyProjectView> {
     });
   }
 
+  void checkLeader(String workspaceUid) async {
+    bool check =
+        await context.read<WorkspaceCubit>().checkLeader(workspaceUid, userUid);
+    setState(() {
+      isLeader = check;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    checkLeader(widget.workspaceUid);
   }
 
   @override
@@ -61,59 +71,70 @@ class _MyProjectViewState extends State<MyProjectView> {
               },
               title: "Projects",
               hasIconButton: true,
-              btn: Container(
-                width: 40.w, // Set the desired width
-                height: 40.w,
-                decoration: const BoxDecoration(
-                  color: primary,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(
-                      10,
+              btn: isLeader == false
+                  ? SizedBox(
+                      width: 40.w, // Set the desired width
+                      height: 40.w,
+                    )
+                  : Container(
+                      width: 40.w, // Set the desired width
+                      height: 40.w,
+                      decoration: const BoxDecoration(
+                        color: primary,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(
+                            10,
+                          ),
+                        ),
+                      ),
+                      child: PopupMenuButton<_MenuValues>(
+                        itemBuilder: (BuildContext context) => [
+                          const PopupMenuItem(
+                            value: _MenuValues.createProject,
+                            child: Text('New project'),
+                          ),
+                        ],
+                        icon: Icon(
+                          FontAwesomeIcons.plus,
+                          color: white,
+                          size: 15.sp,
+                        ),
+                        onSelected: (value) {
+                          switch (value) {
+                            case _MenuValues.createProject:
+                              showModalBottomSheet(
+                                  isScrollControlled: true,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(20),
+                                    ),
+                                  ),
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      MultiBlocProvider(
+                                        providers: [
+                                          BlocProvider(
+                                            create: (context) =>
+                                                WorkspaceCubit(),
+                                          ),
+                                          BlocProvider(
+                                            create: (context) => ProjectCubit(),
+                                          ),
+                                          BlocProvider(
+                                            create: (context) => UserCubit(),
+                                          ),
+                                        ],
+                                        child: MyProjectBottomModalSheet(
+                                          title: "Create Project",
+                                          workspaceUid:
+                                              widget.workspaceUid.toString(),
+                                        ),
+                                      ));
+                              break;
+                          }
+                        },
+                      ),
                     ),
-                  ),
-                ),
-                child: PopupMenuButton<_MenuValues>(
-                  itemBuilder: (BuildContext context) => [
-                    const PopupMenuItem(
-                      value: _MenuValues.createProject,
-                      child: Text('New project'),
-                    ),
-                  ],
-                  icon: Icon(FontAwesomeIcons.plus, color: white, size: 15.sp,),
-                  onSelected: (value) {
-                    switch (value) {
-                      case _MenuValues.createProject:
-                        showModalBottomSheet(
-                            isScrollControlled: true,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(20),
-                              ),
-                            ),
-                            context: context,
-                            builder: (BuildContext context) => MultiBlocProvider(
-                              providers: [
-                                BlocProvider(
-                                  create: (context) => WorkspaceCubit(),
-                                ),
-                                BlocProvider(
-                                  create: (context) => ProjectCubit(),
-                                ),
-                                BlocProvider(
-                                  create: (context) => UserCubit(),
-                                ),
-                              ],
-                              child: MyProjectBottomModalSheet(
-                                title: "Create Project",
-                                workspaceUid: widget.workspaceUid.toString(),
-                              ),
-                            )
-                        );
-                        break;
-                    }
-                  },
-                ),
-              ),
             ),
             body: Container(
               decoration: const BoxDecoration(color: white),
@@ -135,8 +156,8 @@ class _MyProjectViewState extends State<MyProjectView> {
                                     color: neutral_lightgrey,
                                     spreadRadius: 2,
                                     blurRadius: 9,
-                                    offset: Offset(
-                                        0, 3), // changes the position of the shadow
+                                    offset: Offset(0,
+                                        3), // changes the position of the shadow
                                   ),
                                 ],
                               ),
@@ -173,18 +194,24 @@ class _MyProjectViewState extends State<MyProjectView> {
                             StreamBuilder<List<ProjectModel>>(
                               stream: context
                                   .read<ProjectCubit>()
-                                  .getProjectFromWorkspaceUid(user_uid, widget.workspaceUid),
+                                  .getProjectFromWorkspaceUid(
+                                      userUid, widget.workspaceUid),
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
                                   final List<ProjectModel> projectList =
                                       snapshot.data!;
                                   if (projectList.isNotEmpty) {
                                     return _page == 0
-                                        ? MyAllProjects(projects: projectList, name: name,)
+                                        ? MyAllProjects(
+                                            projects: projectList,
+                                            name: name,
+                                            workspaceUid: widget.workspaceUid,
+                                          )
                                         : MyCompletedProjects(
                                             projects: projectList,
                                             name: name,
-                                        );
+                                            workspaceUid: widget.workspaceUid,
+                                          );
                                   } else {
                                     return const NoProjectCard();
                                   }

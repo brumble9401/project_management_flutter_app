@@ -83,8 +83,15 @@ class RouteGenerator {
 
       case RouteName.projects:
         final String workspaceUid = settings.arguments as String;
-        page = BlocProvider(
-          create: (context) => ProjectCubit(),
+        page = MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) => ProjectCubit(),
+            ),
+            BlocProvider(
+              create: (context) => WorkspaceCubit(),
+            ),
+          ],
           child: MyProjectView(
             workspaceUid: workspaceUid,
           ),
@@ -102,7 +109,10 @@ class RouteGenerator {
         break;
 
       case RouteName.project_detail:
-        final project_id = settings.arguments as String;
+        final arguments = settings.arguments as Map<String, dynamic>;
+        final project_id = arguments['projectUid'] as String;
+        final workspaceUid = arguments['workspaceUid'] as String;
+
         page = MultiBlocProvider(
           providers: [
             BlocProvider(
@@ -120,9 +130,13 @@ class RouteGenerator {
             BlocProvider(
               create: (context) => UploadCubit(),
             ),
+            BlocProvider(
+              create: (context) => WorkspaceCubit(),
+            ),
           ],
           child: MyProjectDetail(
             project_id: project_id,
+            workspaceUid: workspaceUid,
           ),
         );
         break;
@@ -142,6 +156,9 @@ class RouteGenerator {
             ),
             BlocProvider(
               create: (context) => UserCubit(),
+            ),
+            BlocProvider(
+              create: (context) => WorkspaceCubit(),
             ),
           ],
           child: MyTaskDetail(taskId: taskId),

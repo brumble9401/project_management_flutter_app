@@ -11,10 +11,12 @@ class MyCompletedProjects extends StatefulWidget {
     super.key,
     required this.projects,
     required this.name,
+    required this.workspaceUid,
   });
 
   final List<ProjectModel> projects;
   final String name;
+  final String workspaceUid;
 
   @override
   State<MyCompletedProjects> createState() => _MyCompletedProjectsState();
@@ -28,7 +30,7 @@ class _MyCompletedProjectsState extends State<MyCompletedProjects> {
 
   @override
   Widget build(BuildContext context) {
-    if(finishedProject.isEmpty){
+    if (finishedProject.isEmpty) {
       return const NoProjectCard();
     }
     return ListView.builder(
@@ -37,25 +39,40 @@ class _MyCompletedProjectsState extends State<MyCompletedProjects> {
       scrollDirection: Axis.vertical,
       itemCount: finishedProject.length,
       itemBuilder: (BuildContext context, int index) {
-        if(widget.name.isEmpty) {
+        if (widget.name.isEmpty) {
           return Padding(
             padding: EdgeInsets.symmetric(vertical: 8.h),
             child: MyProjectCard(
               project: finishedProject[index],
               onPressed: () {
-                Navigator.pushNamed(context, RouteName.project_detail,
-                    arguments: finishedProject[index].id.toString());
+                Navigator.pushNamed(
+                  context,
+                  RouteName.project_detail,
+                  arguments: {
+                    'projectUid': finishedProject[index].id.toString(),
+                    'workspaceUid': widget.workspaceUid,
+                  },
+                );
               },
             ),
           );
-        } else if(finishedProject[index].name!.toLowerCase().startsWith(widget.name)) {
+        } else if (finishedProject[index]
+            .name!
+            .toLowerCase()
+            .startsWith(widget.name)) {
           return Padding(
             padding: EdgeInsets.symmetric(vertical: 8.h),
             child: MyProjectCard(
               project: finishedProject[index],
               onPressed: () {
-                Navigator.pushNamed(context, RouteName.project_detail,
-                    arguments: finishedProject[index].id.toString());
+                Navigator.pushNamed(
+                  context,
+                  RouteName.project_detail,
+                  arguments: {
+                    'projectUid': finishedProject[index].id.toString(),
+                    'workspaceUid': widget.workspaceUid,
+                  },
+                );
               },
             ),
           );

@@ -111,7 +111,7 @@ class WorkspaceCubit extends Cubit<WorkspaceState> {
     try {
       emit(state.copyWith(workspaceStatus: WorkspaceStatus.loading));
 
-      FirebaseFirestore.instance
+      await FirebaseFirestore.instance
           .collection('workspaces')
           .doc(workspaceUid)
           .update({
@@ -173,6 +173,29 @@ class WorkspaceCubit extends Cubit<WorkspaceState> {
       emit(state.copyWith(workspaceStatus: WorkspaceStatus.fail));
       LogUtil.error("Delete workspace error: ", error: e);
       return 'fail';
+    }
+  }
+
+  Future<bool> checkLeader(String workspaceUid, String userUid) async {
+    try {
+      final workspaceDoc = await FirebaseFirestore.instance
+          .collection('workspaces')
+          .doc(workspaceUid)
+          .get();
+      print(workspaceDoc);
+      if (workspaceDoc.exists) {
+        final List<dynamic> leaderIds = workspaceDoc.data()!['leaders_id'];
+
+        // Check if userUid is in the leader_ids list
+        if (leaderIds.contains(userUid)) {
+          return true;
+        }
+      }
+
+      return false; // UserUid is not in the leader_ids list or workspace doesn't exist.
+    } on FirebaseException catch (e) {
+      print(e);
+      return false;
     }
   }
 }

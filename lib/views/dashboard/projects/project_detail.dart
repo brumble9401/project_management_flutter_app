@@ -6,29 +6,29 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:pma_dclv/data/models/project/project_model.dart';
-import 'package:pma_dclv/theme/theme.dart';
-import 'package:pma_dclv/view-model/projects/project_cubit.dart';
-import 'package:pma_dclv/view-model/user/user_cubit.dart';
-import 'package:pma_dclv/views/routes/route_name.dart';
-import 'package:pma_dclv/views/widgets/bottomModalSheet/bottom_modal_sheet.dart';
-import 'package:pma_dclv/views/widgets/card/comment_card.dart';
-import 'package:pma_dclv/views/widgets/comment_box.dart';
-
 import 'package:pma_dclv/data/models/comment/comment_model.dart';
+import 'package:pma_dclv/data/models/project/project_model.dart';
 import 'package:pma_dclv/data/models/task/task_model.dart';
+import 'package:pma_dclv/theme/theme.dart';
 import 'package:pma_dclv/view-model/comment/comment_cubit.dart';
 import 'package:pma_dclv/view-model/files_upload/file_cubit.dart';
+import 'package:pma_dclv/view-model/projects/project_cubit.dart';
 import 'package:pma_dclv/view-model/tasks/task_cubit.dart';
+import 'package:pma_dclv/view-model/user/user_cubit.dart';
+import 'package:pma_dclv/view-model/workspace/workspace_cubit.dart';
+import 'package:pma_dclv/views/routes/route_name.dart';
 import 'package:pma_dclv/views/widgets/appbar/non_title_appbar.dart';
+import 'package:pma_dclv/views/widgets/bottomModalSheet/bottom_modal_sheet.dart';
+import 'package:pma_dclv/views/widgets/card/comment_card.dart';
 import 'package:pma_dclv/views/widgets/card/file_card.dart';
 import 'package:pma_dclv/views/widgets/card/images_add_card.dart';
 import 'package:pma_dclv/views/widgets/card/task/task_add_card.dart';
 import 'package:pma_dclv/views/widgets/card/task/task_card_2.dart';
-import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:pma_dclv/views/widgets/comment_box.dart';
 
 enum _MenuValues {
   addUser,
@@ -37,9 +37,11 @@ enum _MenuValues {
 }
 
 class MyProjectDetail extends StatefulWidget {
-  const MyProjectDetail({super.key, required this.project_id});
+  const MyProjectDetail(
+      {super.key, required this.project_id, required this.workspaceUid});
 
   final String project_id;
+  final String workspaceUid;
 
   @override
   State<MyProjectDetail> createState() => _MyProjectDetailState();
@@ -50,10 +52,11 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
   late quill.QuillController _quillController;
 
   ProjectModel project = ProjectModel();
-  String user_uid = FirebaseAuth.instance.currentUser!.uid;
+  String userUid = FirebaseAuth.instance.currentUser!.uid;
   List<String> userUids = [];
   PlatformFile? pickedImage;
   PlatformFile? pickedFile;
+  bool isLeader = false;
 
   Future<void> pickImage() async {
     final result = await FilePicker.platform.pickFiles();
@@ -91,6 +94,20 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
         .createProjectComment(projectUid, userUid, content);
   }
 
+  void checkLeader(String workspaceUid) async {
+    bool check =
+        await context.read<WorkspaceCubit>().checkLeader(workspaceUid, userUid);
+    setState(() {
+      isLeader = check;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkLeader(widget.workspaceUid);
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<ProjectModel>(
@@ -100,7 +117,8 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
           project = snapshot.data!;
           userUids = project.userIds!;
 
-          List<dynamic> initialContentMap = jsonDecode(project.description.toString());
+          List<dynamic> initialContentMap =
+              jsonDecode(project.description.toString());
           _quillController = quill.QuillController(
             document: quill.Document.fromJson(initialContentMap),
             selection: const TextSelection.collapsed(offset: 0),
@@ -120,57 +138,78 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
                         Navigator.pop(context);
                       },
                       hasIconButton: true,
-                      btn: Container(
-                        width: 40.w, // Set the desired width
-                        height: 40.w,
-                        decoration: const BoxDecoration(
-                          color: primary,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(
-                              10,
-                            ),
-                          ),
-                        ),
-                        child: PopupMenuButton<_MenuValues>(
-                          itemBuilder: (BuildContext context) => [
-                            const PopupMenuItem(
-                              value: _MenuValues.addUser,
-                              child: Text('Add users'),
-                            ),
-                            const PopupMenuItem(
-                              value: _MenuValues.markDone,
-                              child: Text('Mark done'),
-                            ),
-                            const PopupMenuItem(
-                              value: _MenuValues.deleteProject,
-                              child: Text('Delete project'),
-                            ),
-                          ],
-                          icon: Icon(FontAwesomeIcons.plus, color: white, size: 15.sp,),
-                          onSelected: (value) {
-                            switch (value) {
-                              case _MenuValues.addUser:
-                                Navigator.pushNamed(context, RouteName.add_user,
-                                    arguments: {'uids':[project.workspaceId, project.id], 'type': 'projects'});
-                                break;
+                      btn: isLeader == false
+                          ? SizedBox(
+                              width: 40.w, // Set the desired width
+                              height: 40.w,
+                            )
+                          : Container(
+                              width: 40.w, // Set the desired width
+                              height: 40.w,
+                              decoration: const BoxDecoration(
+                                color: primary,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(
+                                    10,
+                                  ),
+                                ),
+                              ),
+                              child: PopupMenuButton<_MenuValues>(
+                                itemBuilder: (BuildContext context) => [
+                                  const PopupMenuItem(
+                                    value: _MenuValues.addUser,
+                                    child: Text('Add users'),
+                                  ),
+                                  const PopupMenuItem(
+                                    value: _MenuValues.markDone,
+                                    child: Text('Mark done'),
+                                  ),
+                                  const PopupMenuItem(
+                                    value: _MenuValues.deleteProject,
+                                    child: Text('Delete project'),
+                                  ),
+                                ],
+                                icon: Icon(
+                                  FontAwesomeIcons.plus,
+                                  color: white,
+                                  size: 15.sp,
+                                ),
+                                onSelected: (value) {
+                                  switch (value) {
+                                    case _MenuValues.addUser:
+                                      Navigator.pushNamed(
+                                          context, RouteName.add_user,
+                                          arguments: {
+                                            'uids': [
+                                              project.workspaceId,
+                                              project.id
+                                            ],
+                                            'type': 'projects'
+                                          });
+                                      break;
 
-                              case _MenuValues.markDone:
-                                context.read<ProjectCubit>().updateProjectStatus(widget.project_id, 'finished');
-                                break;
+                                    case _MenuValues.markDone:
+                                      context
+                                          .read<ProjectCubit>()
+                                          .updateProjectStatus(
+                                              widget.project_id, 'finished');
+                                      break;
 
-                              case _MenuValues.deleteProject:
-                                context.read<ProjectCubit>().deleteProject(widget.project_id).then((_) {
-                                  Navigator.pop(context);
-                                }).catchError((error) {
-                                  // Handle any errors here, if needed
-                                  print("Error deleting project: $error");
-                                });
-                                break;
-                            }
-                          },
-                        ),
-                      ),
-
+                                    case _MenuValues.deleteProject:
+                                      context
+                                          .read<ProjectCubit>()
+                                          .deleteProject(widget.project_id)
+                                          .then((_) {
+                                        Navigator.pop(context);
+                                      }).catchError((error) {
+                                        // Handle any errors here, if needed
+                                        print("Error deleting project: $error");
+                                      });
+                                      break;
+                                  }
+                                },
+                              ),
+                            ),
                     ),
                     body: Container(
                       decoration: const BoxDecoration(
@@ -244,7 +283,9 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
                                     ),
                                     _buildDeadline(project.deadline),
                                     _buildMember(userUids),
-                                    _buildDescription(_quillController.document.toPlainText().toString()),
+                                    _buildDescription(_quillController.document
+                                        .toPlainText()
+                                        .toString()),
                                     _buildImages(),
                                     SizedBox(
                                       height: 20.h,
@@ -267,7 +308,7 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
                             controller: _commentController,
                             onPressed: () {
                               if (_commentController.text != "") {
-                                sendComment(project.id.toString(), user_uid,
+                                sendComment(project.id.toString(), userUid,
                                     _commentController.text);
                                 _commentController.clear();
                               }
@@ -370,11 +411,12 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
               ),
               GestureDetector(
                 onTap: () {
-                  Navigator.pushNamed(context, RouteName.textEditing, arguments: {
-                    'controller': _quillController,
-                    'projectUid': widget.project_id,
-                    'type': 'projects',
-                  });
+                  Navigator.pushNamed(context, RouteName.textEditing,
+                      arguments: {
+                        'controller': _quillController,
+                        'projectUid': widget.project_id,
+                        'type': 'projects',
+                      });
                 },
                 child: const Icon(
                   Icons.edit_outlined,
@@ -411,7 +453,12 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
           Navigator.pushNamed(
             context,
             RouteName.members,
-            arguments: {'uids':userUids, 'projectUid': project.id, 'workspaceUid': project.workspaceId, 'type': 'projects'},
+            arguments: {
+              'uids': userUids,
+              'projectUid': project.id,
+              'workspaceUid': project.workspaceId,
+              'type': 'projects'
+            },
           );
         },
         style: ButtonStyle(
@@ -806,7 +853,10 @@ class _MyProjectDetailState extends State<MyProjectDetail> {
                     itemCount: tasks.length + 1,
                     itemBuilder: (context, index) {
                       if (index == tasks.length) {
-                        return MyTaskAddCard(projectUid: widget.project_id, workspaceUid: workspaceUid,);
+                        return MyTaskAddCard(
+                          projectUid: widget.project_id,
+                          workspaceUid: workspaceUid,
+                        );
                       }
                       return Padding(
                         padding: EdgeInsets.only(right: 10.w),

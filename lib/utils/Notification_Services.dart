@@ -32,10 +32,10 @@ class NotificationServices {
 
     print('User granted permission: ${settings.authorizationStatus}');
   }
-  
+
   Future<void> storeNotification(RemoteMessage message) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
-    
+
     firestore.collection('notifications').add({
       "title": message.notification!.title,
       "body": message.notification!.body,
@@ -48,7 +48,6 @@ class NotificationServices {
 
   Future<String> getToken() async {
     final FCMToken = await messaging.getToken();
-    print(FCMToken);
     return FCMToken.toString();
   }
 
@@ -74,10 +73,11 @@ class NotificationServices {
     await storeNotification(message);
   }
 
-  Future<void> sendPushNotification(UserModel user, String msg, String sender) async {
+  Future<void> sendPushNotification(
+      UserModel user, String msg, String sender) async {
     final body = {
       "to": user.pushToken,
-      "data":{"senderId": sender, "receiver": user.id},
+      "data": {"senderId": sender, "receiver": user.id},
       "notification": {
         "title": "Message",
         "body": msg,
@@ -85,13 +85,13 @@ class NotificationServices {
     };
     try {
       var response = await post(
-        Uri.parse('https://fcm.googleapis.com/fcm/send'),
-        body: jsonEncode(body),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-          HttpHeaders.authorizationHeader: 'key=AAAA7E9dcdg:APA91bG-PkBkS7fnWV4bEfqHQ84Fwd21FA_x8tnS-RZeHvLD41RMfJOaS9lxS4oUkdBgesE822ruHhPgTz2IIKWePkWWLc753JMYhvTOyZ6mIxsgDRWO5DJ5sJBnmdevKK0ZyYWi2cjp'
-        }
-      );
+          Uri.parse('https://fcm.googleapis.com/fcm/send'),
+          body: jsonEncode(body),
+          headers: {
+            HttpHeaders.contentTypeHeader: 'application/json',
+            HttpHeaders.authorizationHeader:
+                'key=AAAA7E9dcdg:APA91bG-PkBkS7fnWV4bEfqHQ84Fwd21FA_x8tnS-RZeHvLD41RMfJOaS9lxS4oUkdBgesE822ruHhPgTz2IIKWePkWWLc753JMYhvTOyZ6mIxsgDRWO5DJ5sJBnmdevKK0ZyYWi2cjp'
+          });
       print('Response status: ${response.statusCode}');
       print('Response body: ${response.body}');
     } on Exception catch (e) {
