@@ -73,9 +73,13 @@ class ProjectCubit extends Cubit<ProjectState> {
     }
   }
 
-  Future<void> updateDescription(QuillController controller, String projectUid) async {
+  Future<void> updateDescription(
+      QuillController controller, String projectUid) async {
     try {
-      await FirebaseFirestore.instance.collection('projects').doc(projectUid).update({
+      await FirebaseFirestore.instance
+          .collection('projects')
+          .doc(projectUid)
+          .update({
         'description': jsonEncode(controller.document.toDelta().toJson()),
       });
       print('Text updated successfully.');
@@ -87,7 +91,22 @@ class ProjectCubit extends Cubit<ProjectState> {
   Future<void> deleteProject(String projectUid) async {
     try {
       emit(state.copyWith(projectStatus: ProjectStatus.loading));
-      await FirebaseFirestore.instance.collection('projects').doc(projectUid).delete();
+      await FirebaseFirestore.instance
+          .collection('projects')
+          .doc(projectUid)
+          .delete();
+      QuerySnapshot tasksSnapshot = await FirebaseFirestore.instance
+          .collection('tasks')
+          .where('project_id', isEqualTo: projectUid)
+          .get();
+
+      for (QueryDocumentSnapshot taskDoc in tasksSnapshot.docs) {
+        // Delete each task document
+        await FirebaseFirestore.instance
+            .collection('tasks')
+            .doc(taskDoc.id)
+            .delete();
+      }
       emit(state.copyWith(projectStatus: ProjectStatus.success));
       LogUtil.info("Delete project successfully");
     } catch (e) {
@@ -98,7 +117,10 @@ class ProjectCubit extends Cubit<ProjectState> {
   Future<void> updateProjectStatus(String projectUid, String status) async {
     try {
       emit(state.copyWith(projectStatus: ProjectStatus.loading));
-      await FirebaseFirestore.instance.collection('projects').doc(projectUid).update({'state': status});
+      await FirebaseFirestore.instance
+          .collection('projects')
+          .doc(projectUid)
+          .update({'state': status});
       emit(state.copyWith(projectStatus: ProjectStatus.success));
       LogUtil.info("Update project successfully");
     } catch (e) {

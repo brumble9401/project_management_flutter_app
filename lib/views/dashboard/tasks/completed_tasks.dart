@@ -31,7 +31,7 @@ class _MyCompletedTasksState extends State<MyCompletedTasks> {
       ),
       itemCount: finishedTasks.length,
       itemBuilder: (context, index) {
-        if(widget.name.isEmpty) {
+        if (widget.name.isEmpty) {
           return MyTaskCard2(
             task: finishedTasks[index],
             onPressed: () {
@@ -42,7 +42,10 @@ class _MyCompletedTasksState extends State<MyCompletedTasks> {
               );
             },
           );
-        } else if (finishedTasks[index].name!.toLowerCase().startsWith(widget.name)) {
+        } else if (finishedTasks[index]
+            .name!
+            .toLowerCase()
+            .startsWith(widget.name)) {
           return MyTaskCard2(
             task: finishedTasks[index],
             onPressed: () {

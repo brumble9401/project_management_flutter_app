@@ -126,13 +126,6 @@ class _SignupScreenState extends State<SignupScreen> {
                     listener: (context, state) async {
                       // TODO: implement listener
                       if (state.authStatus == AuthStatus.registerSuccess) {
-                        // Navigator.pushAndRemoveUntil(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) => const MyWidgetTree(),
-                        //   ),
-                        //   (route) => false,
-                        // );
                         Navigator.pop(context);
                       } else if (state.authStatus == AuthStatus.registerFail) {
                         await QuickAlert.show(

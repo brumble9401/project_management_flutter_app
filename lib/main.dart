@@ -33,7 +33,7 @@ Future<void> main() async {
   String FCMToken = await NotificationServices().getToken();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  await preferences.setInt('initScreen', 0);
+  await preferences.setInt('initScreen', 1);
 
   runApp(MyApp(
     initialRoot: preferences.getInt('initScreen') == 0

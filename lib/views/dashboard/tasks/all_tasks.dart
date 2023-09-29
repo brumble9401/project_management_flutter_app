@@ -19,6 +19,16 @@ class MyAllTasks extends StatefulWidget {
 class _MyAllTasksState extends State<MyAllTasks> {
   late final List<TaskModel> uncompletedTasks =
       widget.tasks.where((task) => task.state == "inprogress").toList();
+  Offset _tapPosition = Offset.zero;
+
+  void _getTapPosition(TapDownDetails tapDownDetails) {
+    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    setState(() {
+      _tapPosition = renderBox.globalToLocal(tapDownDetails.globalPosition);
+      print(_tapPosition);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (uncompletedTasks.isEmpty) {
@@ -46,30 +56,14 @@ class _MyAllTasksState extends State<MyAllTasks> {
                 );
               },
               onLongPressed: () async {
-                final RenderBox overlay = Overlay.of(context)!
-                    .context
-                    .findRenderObject() as RenderBox;
-                // final position = RelativeRect.fromRect(
-                //   Rect.fromPoints(
-                //     Offset.zero,
-                //     Offset.zero,
-                //   ),
-                //   Offset.zero & overlay.size,
-                // );
-                // final RenderBox overlay =
-                //     context.findRenderObject() as RenderBox;
-                final position = RelativeRect.fromRect(
-                  Rect.fromPoints(
-                    overlay.localToGlobal(
-                        Offset.zero), // Get the global position of the card
-                    overlay.localToGlobal(Offset.zero), // Same as above
-                  ),
-                  Offset.zero & overlay.size,
-                );
-
                 final selectedItem = await showMenu(
                   context: context,
-                  position: position,
+                  position: RelativeRect.fromLTRB(
+                    _tapPosition.dx,
+                    _tapPosition.dy,
+                    _tapPosition.dx,
+                    _tapPosition.dy,
+                  ),
                   items: [
                     PopupMenuItem<String>(
                       value: 'delete',

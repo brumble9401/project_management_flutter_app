@@ -132,7 +132,6 @@ class _ProfilePageState extends State<ProfilePage> {
                           confirmBtnColor: semantic_green,
                           onConfirmBtnTap: () {
                             Navigator.pop(context);
-                            Navigator.pop(context);
                           },
                         );
                       }

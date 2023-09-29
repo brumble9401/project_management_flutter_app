@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pma_dclv/data/models/notification/notification_model.dart';
@@ -9,15 +8,20 @@ import 'package:pma_dclv/view-model/user/user_cubit.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class MyNotificationCard extends StatelessWidget {
-  const MyNotificationCard({super.key, required this.notificationModel, required this.onPress});
+  const MyNotificationCard(
+      {super.key, required this.notificationModel, required this.onPress});
 
   final NotificationModel notificationModel;
   final Function() onPress;
 
   @override
   Widget build(BuildContext context) {
-    final difference = DateTime.now().difference(notificationModel.createdDate!);
-    final timeAgo = timeago.format(DateTime.now().subtract(difference), locale: 'en', );
+    final difference =
+        DateTime.now().difference(notificationModel.createdDate!);
+    final timeAgo = timeago.format(
+      DateTime.now().subtract(difference),
+      locale: 'en',
+    );
 
     return Padding(
       padding: EdgeInsets.only(top: 8.h, bottom: 8.h),
@@ -27,7 +31,10 @@ class MyNotificationCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: white,
           borderRadius: BorderRadius.all(Radius.circular(10.h)),
-          border: Border.all(color: neutral_lightgrey),
+          border: Border.all(
+              color: notificationModel.read == 'true'
+                  ? neutral_lightgrey
+                  : primary),
         ),
         child: OutlinedButton(
           onPressed: onPress,
@@ -35,7 +42,7 @@ class MyNotificationCard extends StatelessWidget {
             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(
-                Radius.circular(10.h),
+                  Radius.circular(10.h),
                 ),
               ),
             ),
@@ -53,25 +60,25 @@ class MyNotificationCard extends StatelessWidget {
                       height: 3.h,
                     ),
                     StreamBuilder<UserModel>(
-                      stream: context.read<UserCubit>().getUserFromUid(notificationModel.payload!['senderId']),
-                      builder: (context, snapshot) {
-                        if(snapshot.hasData) {
-                          UserModel user = snapshot.data!;
-                          return Text(
-                            "${notificationModel.title.toString()} from ${user.firstName} ${user.lastName}",
-                            style: TextStyle(
-                              fontSize: 15.sp,
-                              color: neutral_dark,
-                              fontWeight: FontWeight.bold,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            softWrap: true,
-                          );
-                        } else {
-                          return Container();
-                        }
-                      }
-                    ),
+                        stream: context.read<UserCubit>().getUserFromUid(
+                            notificationModel.payload!['senderId']),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            UserModel user = snapshot.data!;
+                            return Text(
+                              "${notificationModel.title.toString()} from ${user.firstName} ${user.lastName}",
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                color: neutral_dark,
+                                fontWeight: FontWeight.bold,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              softWrap: true,
+                            );
+                          } else {
+                            return Container();
+                          }
+                        }),
                     Text(
                       notificationModel.body.toString(),
                       style: TextStyle(
@@ -106,7 +113,8 @@ class MyNotificationCard extends StatelessWidget {
                     height: 11.w,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: notificationModel.read == "false" ? primary : white,
+                      color:
+                          notificationModel.read == "false" ? primary : white,
                     ),
                   ),
                   SizedBox(

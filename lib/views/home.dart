@@ -56,12 +56,10 @@ class _MyHomePageState extends State<MyHomePage> {
           create: (context) => ChatCubit(),
         ),
       ],
-      child: MyChatPage(),
+      child: const MyChatPage(),
     ),
     MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (context) => NotificationCubit())
-      ],
+      providers: [BlocProvider(create: (context) => NotificationCubit())],
       child: const MyNotificationPage(),
     ),
     BlocProvider(
@@ -77,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
       bottomNavigationBar: Container(
         height: 60.h,
         padding: EdgeInsets.only(bottom: 10.h),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: white,
         ),
         child: CustomNavigationBar(
